@@ -1,0 +1,14 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: datasite-poc
+
+kafka:
+  bootstrapAddress: localhost:9092
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    org.mongodb.driver: WARN

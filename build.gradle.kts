@@ -1,0 +1,3 @@
+
+group = "com.datasite.poc.garden"
+version = "0.0.1-SNAPSHOT"
