@@ -53,13 +53,18 @@ class KafkaStreamsConfiguration(
                 Consumed.with(stringSerde, stringSerde)
         )
 
-        val (steveStream, otherStream) = stream.branch(
-                Predicate { key, value -> value.contains("steve") },
+        val (steveStream, brianStream, otherStream) = stream.branch(
+                Predicate { key, value -> value.contains("steve", true) },
+                Predicate { key, value -> value.contains("brian", true) },
                 Predicate { key, value -> true }
         )
 
         steveStream.foreach { key, value ->
             logger.info("STEVE STREAM : {} : {}", key, value)
+        }
+
+        brianStream.foreach { key, value ->
+            logger.info("BRIAN STREAM : {} : {}", key, value)
         }
 
         otherStream.foreach { key, value ->
