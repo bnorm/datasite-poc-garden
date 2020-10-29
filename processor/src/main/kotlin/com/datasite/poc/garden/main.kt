@@ -9,32 +9,39 @@ import org.apache.kafka.common.utils.Bytes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
-import org.apache.kafka.streams.kstream.Materialized
-import java.util.Properties
+import org.apache.kafka.streams.state.KeyValueStore
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.time.Instant
+import java.util.*
+import org.apache.kafka.streams.kstream.Materialized.`as` as materializedAs
 
 suspend fun main() {
     val source = "mongo.datasite-poc.gardens"
-    val dest = "gardens"
     val kafka = "localhost:9092"
 
     val props = Properties()
-    props[StreamsConfig.APPLICATION_ID_CONFIG] = "$source-cdc"
+    props[StreamsConfig.APPLICATION_ID_CONFIG] = "datasite-poc-processor"
     props[StreamsConfig.BOOTSTRAP_SERVERS_CONFIG] = kafka
     props[StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG] = Serdes.Bytes()::class.java
     props[StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG] = Serdes.Bytes()::class.java
 
     val builder = StreamsBuilder()
     val cdc = builder.stream<Bytes, Bytes>(source)
-    val table = builder.table<Bytes, Bytes>(dest)
 
-    cdc.leftJoin(table) { left, right -> merge(right, left) }
-        .groupByKey()
-        .reduce({ _, bytes -> bytes }, Materialized.`as`("$dest.table"))
-        .toStream()
-        .to(dest)
+    val gardenTable = cdc.groupByKey()
+        .aggregate(
+            { null },
+            { _, value, agg -> merge(agg, value) },
+            materializedAs<Bytes, Bytes?, KeyValueStore<Bytes, ByteArray>>("$source.table")
+                .withCachingDisabled()
+        )
+
+    gardenTable.toStream().foreach { _, value ->
+        if (value != null) {
+            println("foreach = ${String(value.get(), StandardCharsets.UTF_8)}")
+        }
+    }
 
     val streams = KafkaStreams(builder.build(), props)
     streams.start()
