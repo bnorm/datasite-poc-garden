@@ -24,6 +24,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
 
 	implementation("org.apache.kafka:kafka-streams")
+	implementation("org.apache.kafka:kafka-clients")
 	implementation("org.springframework.kafka:spring-kafka")
 
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
