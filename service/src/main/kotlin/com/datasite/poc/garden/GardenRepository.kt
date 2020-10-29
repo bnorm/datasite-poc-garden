@@ -21,7 +21,7 @@ class GardenRepository(
 ) {
     @PostConstruct
     fun createCollections(): Unit = runBlocking {
-        if (mongoOperation.getCollection(GARDEN_COLLECTION).awaitSingleOrNull() == null) {
+        if (!mongoOperation.collectionExists(GARDEN_COLLECTION).awaitSingle()) {
             mongoOperation.createCollection(GARDEN_COLLECTION).awaitSingle()
         }
     }
