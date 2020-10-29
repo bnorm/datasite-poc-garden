@@ -12,6 +12,16 @@ Content-Type: application/json
 
 > {% client.global.set("garden_id", response.body.id); %}
 
+### Create a new garden
+PUT http://localhost:8080/api/v1/gardens/{{garden_id}}
+Content-Type: application/json
+
+{
+  "name": "My Other Garden"
+}
+
+> {% client.global.set("garden_id", response.body.id); %}
+
 ### Get a garden
 GET http://localhost:8080/api/v1/gardens/{{garden_id}}
 

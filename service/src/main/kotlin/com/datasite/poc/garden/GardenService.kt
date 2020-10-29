@@ -1,6 +1,7 @@
 package com.datasite.poc.garden
 
 import com.datasite.poc.garden.dto.Garden
+import com.datasite.poc.garden.dto.GardenPatch
 import com.datasite.poc.garden.dto.GardenPrototype
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -28,6 +29,15 @@ class GardenService(
         return transactionalOperator.executeAndAwait {
             Garden.from(repository.createGarden(prototype))
         }!!
+    }
+
+    suspend fun updateGarden(
+        id: String,
+        patch: GardenPatch
+    ): Garden? {
+        return transactionalOperator.executeAndAwait {
+            repository.updateGarden(id, patch)?.let { Garden.from(it) }
+        }
     }
 
     suspend fun deleteGarden(

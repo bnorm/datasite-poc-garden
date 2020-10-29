@@ -1,5 +1,6 @@
 package com.datasite.poc.garden
 
+import com.datasite.poc.garden.dto.GardenPatch
 import com.datasite.poc.garden.dto.GardenPrototype
 import com.datasite.poc.garden.entity.GARDEN_COLLECTION
 import com.datasite.poc.garden.entity.GardenEntity
@@ -12,6 +13,12 @@ import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.ReactiveMongoOperations
 import org.springframework.data.mongodb.core.findAll
 import org.springframework.data.mongodb.core.findById
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query.query
+import org.springframework.data.mongodb.core.query.Update
+import org.springframework.data.mongodb.core.query.isEqualTo
+import org.springframework.data.mongodb.core.remove
+import org.springframework.data.mongodb.core.updateFirst
 import org.springframework.stereotype.Repository
 import javax.annotation.PostConstruct
 
@@ -39,10 +46,33 @@ class GardenRepository(
     ): GardenEntity =
         mongoOperation.save(GardenEntity.from(prototype)).awaitSingle()
 
+    suspend fun updateGarden(
+        id: String,
+        patch: GardenPatch
+    ): GardenEntity? {
+        val query = query(Criteria.where("_id").isEqualTo(ObjectId(id)))
+        val update = patch.update()
+        if (null != update) {
+            mongoOperation.updateFirst<GardenEntity>(query, update).awaitSingle()
+        }
+        return getGarden(id)
+    }
+
     suspend fun deleteGarden(
         id: String
     ) {
-        val garden = getGarden(id) ?: return
-        mongoOperation.remove(garden).awaitSingle()
+        val query = query(Criteria.where("_id").isEqualTo(ObjectId(id)))
+        mongoOperation.remove<GardenEntity>(query).awaitSingle()
+    }
+
+    private fun GardenPatch.update(): Update? {
+        return Update().apply {
+            var modified = false
+            if (name != null) {
+                set("name", name)
+                modified = true
+            }
+            if (!modified) return null
+        }
     }
 }

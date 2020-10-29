@@ -17,3 +17,7 @@ data class Garden(
 data class GardenPrototype(
     val name: String,
 )
+
+data class GardenPatch(
+    val name: String? = null,
+)
