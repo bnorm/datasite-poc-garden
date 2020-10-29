@@ -3,6 +3,7 @@ package com.datasite.poc.garden
 import com.datasite.poc.garden.dto.GardenPrototype
 import com.datasite.poc.garden.entity.GARDEN_COLLECTION
 import com.datasite.poc.garden.entity.GardenEntity
+import javax.annotation.PostConstruct
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitSingle
@@ -13,7 +14,6 @@ import org.springframework.data.mongodb.core.ReactiveMongoOperations
 import org.springframework.data.mongodb.core.findAll
 import org.springframework.data.mongodb.core.findById
 import org.springframework.stereotype.Repository
-import javax.annotation.PostConstruct
 
 @Repository
 class GardenRepository(
@@ -21,7 +21,7 @@ class GardenRepository(
 ) {
     @PostConstruct
     fun createCollections(): Unit = runBlocking {
-        if (mongoOperation.getCollection(GARDEN_COLLECTION).awaitSingleOrNull() == null) {
+        if (!mongoOperation.collectionExists(GARDEN_COLLECTION).awaitSingle()) {
             mongoOperation.createCollection(GARDEN_COLLECTION).awaitSingle()
         }
     }
