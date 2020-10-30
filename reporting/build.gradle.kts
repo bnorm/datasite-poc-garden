@@ -5,6 +5,7 @@ plugins {
 	id("io.spring.dependency-management")
 	kotlin("jvm")
 	kotlin("plugin.spring")
+	kotlin("plugin.serialization")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_11
@@ -20,8 +21,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 
-	implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+	implementation("io.r2dbc:r2dbc-postgresql")
 
 	implementation("org.apache.kafka:kafka-streams")
 	implementation("org.springframework.kafka:spring-kafka")
@@ -40,7 +43,7 @@ dependencies {
 	testImplementation("org.springframework.kafka:spring-kafka-test")
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:kafka")
-	testImplementation("org.testcontainers:mongodb")
+	testImplementation("org.testcontainers:postgresql")
 }
 
 dependencyManagement {

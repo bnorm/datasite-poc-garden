@@ -41,16 +41,6 @@ services:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
 
-  mongo:
-    image: mongo:4.0.9
-    hostname: mongo
-    ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_DATABASE: database-poc
-      MONGO_REPLICA_SET_NAME: rs0
-    entrypoint: ["mongod", "--bind_ip_all", "--replSet", "rs0"]
-
   connect:
     image: debezium/connect:1.3
     ports:
@@ -67,3 +57,21 @@ services:
       - STATUS_STORAGE_TOPIC=my_source_connect_statuses
       - CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE=false
       - CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE=false
+
+  mongo:
+    image: mongo:4.0.9
+    hostname: mongo
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: database-poc
+      MONGO_REPLICA_SET_NAME: rs0
+    entrypoint: [ "mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  postgresql:
+    image: postgres:11.6
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: datasite-poc

@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     kotlin("js")
+    kotlin("plugin.serialization")
     id("com.bnorm.react.kotlin-react-function")
 }
 
@@ -26,7 +27,9 @@ kotlin {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.0")
 
-    implementation("io.ktor:ktor-client-auth-js:1.4.1")
+    implementation("io.ktor:ktor-client-json-js:1.4.1")
+    implementation("io.ktor:ktor-client-serialization-js:1.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 
     implementation("com.bnorm.react:kotlin-react-function:0.2.1")
     implementation("org.jetbrains:kotlin-extensions:1.0.1-pre.126-kotlin-1.4.10")

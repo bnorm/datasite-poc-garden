@@ -1,0 +1,12 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/database-poc
+    username: postgres
+    password: postgres
+
+kafka:
+  bootstrapAddress: localhost:9092
+
+logging:
+  level:
+    org.apache.kafka: WARN
