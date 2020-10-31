@@ -3,7 +3,6 @@ package com.datasite.poc.garden
 import com.datasite.poc.garden.dto.Garden
 import com.datasite.poc.garden.dto.GardenPatch
 import com.datasite.poc.garden.dto.GardenPrototype
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactive.awaitSingleOrNull
 import org.springframework.http.HttpStatus
@@ -23,7 +22,7 @@ class GardenController(
     private val service: GardenService,
 ) {
     @GetMapping
-    fun getAllGardens(): Flow<Garden> = service.getAllGardens()
+    suspend fun getAllGardens(): List<Garden> = service.getAllGardens()
 
     @GetMapping("/{id}")
     suspend fun getGarden(

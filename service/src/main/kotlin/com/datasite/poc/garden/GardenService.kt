@@ -3,12 +3,11 @@ package com.datasite.poc.garden
 import com.datasite.poc.garden.dto.Garden
 import com.datasite.poc.garden.dto.GardenPatch
 import com.datasite.poc.garden.dto.GardenPrototype
-import kotlinx.coroutines.flow.Flow
+import com.datasite.poc.garden.entity.toGarden
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactor.mono
-import org.slf4j.LoggerFactory
-import org.springframework.data.mongodb.currentClientSession
-import org.springframework.data.mongodb.transactionId
+import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
@@ -16,21 +15,30 @@ import reactor.core.publisher.Mono
 @Service
 class GardenService(
     private val repository: GardenRepository,
+    private val auditService: AuditService,
 ) {
-    private val log = LoggerFactory.getLogger(this::class.java)
-
-    fun getAllGardens(): Flow<Garden> = repository.getAllGardens().map { Garden.from(it) }
+    suspend fun getAllGardens(): List<Garden> {
+        val gardens = repository.getAllGardens().map { it.toGarden() }.toList()
+        auditService.auditAllGardensAccess()
+        return gardens
+    }
 
     suspend fun getGarden(
         id: String
-    ): Garden? = repository.getGarden(id)?.let { Garden.from(it) }
+    ): Garden? {
+        val objectId = id.toObjectId() ?: return null
+        val entity = repository.getGarden(objectId) ?: return null
+        auditService.auditGardenAccess(id)
+        return entity.toGarden()
+    }
 
     @Transactional // suspend should work in spring boot 2.4
     fun createGarden(
         prototype: GardenPrototype
     ): Mono<Garden> = mono {
-        log.info("processing transaction with id: {}", currentClientSession()?.transactionId)
-        Garden.from(repository.createGarden(prototype))
+        val entity = repository.createGarden(prototype)
+        auditService.auditGardenCreate()
+        return@mono entity.toGarden()
     }
 
     @Transactional // suspend should work in spring boot 2.4
@@ -38,15 +46,20 @@ class GardenService(
         id: String,
         patch: GardenPatch
     ): Mono<Garden?> = mono {
-        log.info("processing transaction with id: {}", currentClientSession()?.transactionId)
-        repository.updateGarden(id, patch)?.let { Garden.from(it) }
+        val objectId = id.toObjectId() ?: return@mono null
+        val entity = repository.updateGarden(objectId, patch) ?: return@mono null
+        auditService.auditGardenUpdate()
+        return@mono entity.toGarden()
     }
 
     @Transactional // suspend should work in spring boot 2.4
     fun deleteGarden(
         id: String
     ): Mono<Unit> = mono {
-        log.info("processing transaction with id: {}", currentClientSession()?.transactionId)
-        repository.deleteGarden(id)
+        val objectId = id.toObjectId() ?: return@mono null
+        repository.deleteGarden(objectId)
+        auditService.auditGardenDelete()
     }
 }
+
+private fun String.toObjectId() = if (ObjectId.isValid(this)) ObjectId(this) else null
