@@ -5,17 +5,19 @@ import com.datasite.poc.garden.dto.GardenPatch
 import com.datasite.poc.garden.dto.GardenPrototype
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.reactor.mono
+import org.slf4j.LoggerFactory
+import org.springframework.data.mongodb.currentClientSession
+import org.springframework.data.mongodb.transactionId
 import org.springframework.stereotype.Service
-import org.springframework.transaction.ReactiveTransactionManager
-import org.springframework.transaction.reactive.TransactionalOperator
-import org.springframework.transaction.reactive.executeAndAwait
+import org.springframework.transaction.annotation.Transactional
+import reactor.core.publisher.Mono
 
 @Service
 class GardenService(
     private val repository: GardenRepository,
-    transactionManager: ReactiveTransactionManager,
 ) {
-    private val transactionalOperator = TransactionalOperator.create(transactionManager)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     fun getAllGardens(): Flow<Garden> = repository.getAllGardens().map { Garden.from(it) }
 
@@ -23,28 +25,28 @@ class GardenService(
         id: String
     ): Garden? = repository.getGarden(id)?.let { Garden.from(it) }
 
-    suspend fun createGarden(
+    @Transactional // suspend should work in spring boot 2.4
+    fun createGarden(
         prototype: GardenPrototype
-    ): Garden {
-        return transactionalOperator.executeAndAwait {
-            Garden.from(repository.createGarden(prototype))
-        }!!
+    ): Mono<Garden> = mono {
+        log.info("processing transaction with id: {}", currentClientSession()?.transactionId)
+        Garden.from(repository.createGarden(prototype))
     }
 
-    suspend fun updateGarden(
+    @Transactional // suspend should work in spring boot 2.4
+    fun updateGarden(
         id: String,
         patch: GardenPatch
-    ): Garden? {
-        return transactionalOperator.executeAndAwait {
-            repository.updateGarden(id, patch)?.let { Garden.from(it) }
-        }
+    ): Mono<Garden?> = mono {
+        log.info("processing transaction with id: {}", currentClientSession()?.transactionId)
+        repository.updateGarden(id, patch)?.let { Garden.from(it) }
     }
 
-    suspend fun deleteGarden(
+    @Transactional // suspend should work in spring boot 2.4
+    fun deleteGarden(
         id: String
-    ) {
-        transactionalOperator.executeAndAwait {
-            repository.deleteGarden(id)
-        }
+    ): Mono<Unit> = mono {
+        log.info("processing transaction with id: {}", currentClientSession()?.transactionId)
+        repository.deleteGarden(id)
     }
 }
