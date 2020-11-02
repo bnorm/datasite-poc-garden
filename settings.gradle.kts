@@ -1,5 +1,6 @@
 rootProject.name = "datasite-poc-garden"
 
+include(":auditing:common")
 include(":processor")
 include(":reporting:common")
 include(":reporting:service")

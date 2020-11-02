@@ -4,6 +4,7 @@ import com.datasite.poc.garden.dto.GardenPatch
 import com.datasite.poc.garden.dto.GardenPrototype
 import com.datasite.poc.garden.entity.GARDEN_COLLECTION
 import com.datasite.poc.garden.entity.GardenEntity
+import com.datasite.poc.garden.entity.toEntity
 import javax.annotation.PostConstruct
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.asFlow
@@ -37,20 +38,20 @@ class GardenRepository(
         mongoOperation.findAll<GardenEntity>().asFlow()
 
     suspend fun getGarden(
-        id: String
+        id: ObjectId
     ): GardenEntity? =
-        mongoOperation.findById<GardenEntity>(ObjectId(id)).awaitSingleOrNull()
+        mongoOperation.findById<GardenEntity>(id).awaitSingleOrNull()
 
     suspend fun createGarden(
         prototype: GardenPrototype
     ): GardenEntity =
-        mongoOperation.save(GardenEntity.from(prototype)).awaitSingle()
+        mongoOperation.save(prototype.toEntity()).awaitSingle()
 
     suspend fun updateGarden(
-        id: String,
+        id: ObjectId,
         patch: GardenPatch
     ): GardenEntity? {
-        val query = query(Criteria.where("_id").isEqualTo(ObjectId(id)))
+        val query = query(Criteria.where("_id").isEqualTo(id))
         val update = patch.update()
         if (null != update) {
             mongoOperation.updateFirst<GardenEntity>(query, update).awaitSingle()
@@ -59,9 +60,9 @@ class GardenRepository(
     }
 
     suspend fun deleteGarden(
-        id: String
+        id: ObjectId
     ) {
-        val query = query(Criteria.where("_id").isEqualTo(ObjectId(id)))
+        val query = query(Criteria.where("_id").isEqualTo(id))
         mongoOperation.remove<GardenEntity>(query).awaitSingle()
     }
 

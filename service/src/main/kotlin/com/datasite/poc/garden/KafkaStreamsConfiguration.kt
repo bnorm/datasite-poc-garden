@@ -54,9 +54,9 @@ class KafkaStreamsConfiguration(
         )
 
         val (steveStream, brianStream, otherStream) = stream.branch(
-                Predicate { key, value -> value.contains("steve", true) },
-                Predicate { key, value -> value.contains("brian", true) },
-                Predicate { key, value -> true }
+                Predicate { _, value -> value?.contains("steve", true) == true },
+                Predicate { _, value -> value?.contains("brian", true) == true },
+                Predicate { _, _ -> true }
         )
 
         steveStream.foreach { key, value ->

@@ -59,7 +59,7 @@ services:
       - CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE=false
 
   mongo:
-    image: mongo:4.0.9
+    image: mongo:4.2
     hostname: mongo
     ports:
       - 27017:27017

@@ -36,3 +36,18 @@ curl -i -X POST \
   }
 }'
 ```
+
+### IntelliJ HTTP Requests
+
+Create a `http-client-private.env.json` file in the project root directory with
+the following template:
+```json
+{
+  "<environment name>": {
+    "user_id": "<user name>"
+  }
+}
+```
+
+Replace `<environment name>` and the `<user name>` values with appropriate
+values. For example, you could replace with `local` and `john` respectively.

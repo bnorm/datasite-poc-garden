@@ -1,9 +1,8 @@
 package com.datasite.poc.garden
 
 import com.datasite.poc.garden.entity.GARDEN_COLLECTION
-import com.fasterxml.jackson.databind.JsonNode
 import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.connect.json.JsonDeserializer
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -26,30 +25,38 @@ class KafkaListenerConfig(
     private val log = LoggerFactory.getLogger(KafkaListenerConfig::class.java)
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<JsonNode, JsonNode> {
+    fun consumerFactory(): ConsumerFactory<String, String> {
         return DefaultKafkaConsumerFactory(
             mapOf(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapAddress,
                 ConsumerConfig.GROUP_ID_CONFIG to "datasite-poc-garden",
-                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to JsonDeserializer::class.java,
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to JsonDeserializer::class.java,
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
             )
         )
     }
 
     @Bean
     fun kafkaListenerContainerFactory(
-        consumerFactory: ConsumerFactory<JsonNode, JsonNode>
-    ): ConcurrentKafkaListenerContainerFactory<JsonNode, JsonNode> {
-        return ConcurrentKafkaListenerContainerFactory<JsonNode, JsonNode>().apply {
+        consumerFactory: ConsumerFactory<String, String>
+    ): ConcurrentKafkaListenerContainerFactory<String, String> {
+        return ConcurrentKafkaListenerContainerFactory<String, String>().apply {
             this.consumerFactory = consumerFactory
         }
     }
 
     @KafkaListener(topics = ["mongo.\${spring.data.mongodb.database}.${GARDEN_COLLECTION}"])
     fun mongoChanges(
-        @Payload(required = false) message: JsonNode?,
-        @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY, required = false) key: JsonNode?,
+        @Payload(required = false) message: String?,
+        @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY, required = false) key: String?,
+    ) {
+        log.info("Received message: $key=$message")
+    }
+
+    @KafkaListener(topics = ["auditing.garden.events"])
+    fun auditEvents(
+        @Payload(required = false) message: String?,
+        @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY, required = false) key: String?,
     ) {
         log.info("Received message: $key=$message")
     }
