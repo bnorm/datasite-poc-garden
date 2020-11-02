@@ -8,14 +8,14 @@ sealed class AuditEvent {
     abstract val userId: String
 
     @Serializable
-    class AllGardensAccess(
+    data class AllGardensAccess(
         override val userId: String,
     ) : AuditEvent() {
         override val transactionId: String? = null
     }
 
     @Serializable
-    class GardenAccess(
+    data class GardenAccess(
         override val userId: String,
         val gardenId: String,
     ) : AuditEvent() {
@@ -23,19 +23,19 @@ sealed class AuditEvent {
     }
 
     @Serializable
-    class GardenCreate(
+    data class GardenCreate(
         override val transactionId: String,
         override val userId: String,
     ) : AuditEvent()
 
     @Serializable
-    class GardenUpdate(
+    data class GardenUpdate(
         override val transactionId: String,
         override val userId: String,
     ) : AuditEvent()
 
     @Serializable
-    class GardenDelete(
+    data class GardenDelete(
         override val transactionId: String,
         override val userId: String,
     ) : AuditEvent()
