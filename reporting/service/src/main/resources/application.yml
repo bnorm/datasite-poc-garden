@@ -1,8 +1,13 @@
+server:
+  port: 8088
+
 spring:
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/database-poc
+    url: r2dbc:postgresql://localhost:5432/datasite-poc
     username: postgres
     password: postgres
+    pool:
+      enabled: true
 
 kafka:
   bootstrapAddress: localhost:9092

@@ -9,6 +9,6 @@ sealed class EnrichedAuditEvent {
     @Serializable
     data class GardenAccess(
         override val userId: String,
-        val garden: Garden,
+        val garden: MongoGarden,
     ) : EnrichedAuditEvent()
 }

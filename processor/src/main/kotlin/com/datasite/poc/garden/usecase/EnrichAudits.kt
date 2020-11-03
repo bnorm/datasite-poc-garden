@@ -3,7 +3,7 @@ package com.datasite.poc.garden.usecase
 import com.datasite.poc.garden.KotlinxSerde
 import com.datasite.poc.garden.audit.dto.AuditEvent
 import com.datasite.poc.garden.audit.dto.EnrichedAuditEvent
-import com.datasite.poc.garden.audit.dto.Garden
+import com.datasite.poc.garden.audit.dto.MongoGarden
 import com.datasite.poc.garden.audit.dto.ObjectId
 import com.datasite.poc.garden.filterIsInstance
 import com.datasite.poc.garden.jsonFormat
@@ -37,12 +37,12 @@ suspend fun main() {
     )
 
     // Cannot consume KTable topic as it will compact and hide deleted entities
-    val mongoTable = builder.mongoOpLog(mongoCdcSource).toKTable<Garden>()
+    val mongoTable = builder.mongoOpLog(mongoCdcSource).toKTable<MongoGarden>()
 
     audits
         .filterIsInstance<String, AuditEvent.GardenAccess>()
         .selectKey { _, value -> jsonFormat.encodeToString(ObjectId(value.gardenId)) }
-        .join<Garden, EnrichedAuditEvent>(mongoTable) { audit, garden ->
+        .join<MongoGarden, EnrichedAuditEvent>(mongoTable) { audit, garden ->
             EnrichedAuditEvent.GardenAccess(audit.userId, garden)
         }
         .foreach { _, value -> println("enriched = $value") }

@@ -1,37 +1,60 @@
 package com.datasite.poc.garden.report
 
-import com.datasite.poc.garden.report.dto.Dummy
-import com.datasite.poc.garden.report.dto.ReportEvent
-import com.datasite.poc.garden.report.entity.toDummy
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import com.datasite.poc.garden.audit.dto.AuditEvent
+import com.datasite.poc.garden.audit.dto.MongoGarden
+import com.datasite.poc.garden.report.dto.MostPopularGardensReport
+import com.datasite.poc.garden.report.dto.Report
+import com.datasite.poc.garden.report.dto.UsersFavoriteGardenReport
+import com.datasite.poc.garden.report.entity.GardenEntity
+import com.datasite.poc.garden.report.entity.toReport
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import org.slf4j.LoggerFactory
+import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Service
-import javax.annotation.PostConstruct
 
 @Service
 class ReportService(
     private val repository: ReportRepository,
-    private val events: SharedFlow<ReportEvent>,
+    private val json: Json,
 ) {
-    private val scope = CoroutineScope(Dispatchers.Default + CoroutineName("ReportService"))
+    private val log = LoggerFactory.getLogger(this::class.java)
 
-    @PostConstruct
-    fun init() {
-        scope.launch {
-            events.collect { event ->
-                when (event) {
-                    is ReportEvent.DummyEvent -> repository.insertDummyEvent(event)
-                }
-            }
+    private val _reportFlow = MutableSharedFlow<Report>()
+    val reportFlow = _reportFlow.asSharedFlow()
+
+    suspend fun getMostPopularGardensReport(): MostPopularGardensReport =
+        repository.getGardenViewCounts().toList().toReport()
+
+    suspend fun getUsersFavoriteGardenReport(): UsersFavoriteGardenReport =
+        repository.getUserTopGarden().toList().toReport()
+
+    @KafkaListener(topics = ["mongo.garden.table"])
+    fun gardenTableChanges(@Payload message: String?) = runBlocking {
+        log.info("Processing Mongo gardens table change {}", message)
+        if (message != null) {
+            val garden = json.decodeFromString<MongoGarden>(message)
+            repository.upsertGarden(GardenEntity(garden.id.oid, garden.name))
+        } else {
+            // TODO get key and delete garden
         }
+        _reportFlow.emit(getUsersFavoriteGardenReport())
+        _reportFlow.emit(getMostPopularGardensReport())
     }
 
-    fun getDummyEvents(): Flow<Dummy> =
-        repository.getDummyEvents().map { it.toDummy() }
+    @KafkaListener(topics = ["auditing.garden.events"])
+    fun gardenAudits(@Payload message: String) = runBlocking {
+        log.info("Processing audit event {}", message)
+        val event = json.decodeFromString<AuditEvent>(message)
+        if (event is AuditEvent.GardenAccess) {
+            repository.incrementUserGardenViewCount(event.userId, event.gardenId)
+            _reportFlow.emit(getUsersFavoriteGardenReport())
+            _reportFlow.emit(getMostPopularGardensReport())
+        }
+    }
 }

@@ -10,6 +10,6 @@ fun RBuilder.App() {
     +"Hello, World!"
 
     div {
-        DummyReportTable()
+        UsersFavoriteGardenReport()
     }
 }
