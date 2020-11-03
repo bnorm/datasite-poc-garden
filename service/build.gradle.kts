@@ -16,7 +16,7 @@ repositories {
 extra["testcontainersVersion"] = "1.14.3"
 
 dependencies {
-	implementation(project(":auditing:common"))
+	implementation(project(":auditing:auditing-common"))
 
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")

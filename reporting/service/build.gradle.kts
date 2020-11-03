@@ -16,7 +16,7 @@ repositories {
 extra["testcontainersVersion"] = "1.14.3"
 
 dependencies {
-	implementation(project(":reporting:common"))
+	implementation(project(":reporting:reporting-common"))
 
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -64,7 +64,7 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.processResources.configure {
-	from(tasks.getByPath(":reporting:ui:jsBundle")) {
+	from(tasks.getByPath(":reporting:reporting-ui:jsBundle")) {
 		into("static")
 	}
 }
