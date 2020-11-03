@@ -24,7 +24,7 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":reporting:common"))
+    implementation(project(":reporting:reporting-common"))
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.0")
 

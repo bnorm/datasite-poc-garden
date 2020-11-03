@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-	implementation(project(":auditing:common"))
+	implementation(project(":auditing:auditing-common"))
 
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.4.0")
