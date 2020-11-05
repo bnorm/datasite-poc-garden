@@ -1,7 +1,7 @@
 package com.datasite.poc.garden.report
 
-import com.datasite.poc.garden.report.dto.Dummy
-import kotlinx.coroutines.flow.Flow
+import com.datasite.poc.garden.report.dto.MostPopularGardensReport
+import com.datasite.poc.garden.report.dto.UsersFavoriteGardenReport
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,21 +16,24 @@ import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAd
 class ReportController(
     private val service: ReportService
 ) {
-    @GetMapping("/dummies")
-    fun getDummyEvents(): Flow<Dummy> =
-        service.getDummyEvents()
+    @GetMapping("/popular")
+    suspend fun getMostPopularGardensReport(): MostPopularGardensReport =
+        service.getMostPopularGardensReport()
 
+    @GetMapping("/favorite")
+    suspend fun getUsersFavoriteGardenReport(): UsersFavoriteGardenReport =
+        service.getUsersFavoriteGardenReport()
 
     @Configuration
     class WebSocketConfiguration(
-        private val webSocketHandler: ReportEventWebSocketHandler
+        private val reportWebSocketHandler: ReportWebSocketHandler,
     ) {
         @Bean
         fun webSocketHandlerMapping(): HandlerMapping {
             return SimpleUrlHandlerMapping().apply {
                 order = 1
                 urlMap = mapOf(
-                    "/api/v1/reports/events" to webSocketHandler,
+                    "/api/v1/reports" to reportWebSocketHandler,
                 )
             }
         }

@@ -12,7 +12,12 @@ import react.useEffectWithCleanup
 fun useAsync(dependencies: RDependenciesList? = null, block: suspend () -> Unit) {
     useEffectWithCleanup(dependencies) {
         val job = GlobalScope.launch {
-            block()
+            try {
+                block()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                throw t
+            }
         }
         return@useEffectWithCleanup { job.cancel() }
     }

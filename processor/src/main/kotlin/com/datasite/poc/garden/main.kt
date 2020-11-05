@@ -1,6 +1,6 @@
 package com.datasite.poc.garden
 
-import com.datasite.poc.garden.audit.dto.Garden
+import com.datasite.poc.garden.audit.dto.MongoGarden
 import kotlinx.coroutines.awaitCancellation
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.utils.Bytes
@@ -24,7 +24,7 @@ suspend fun main() {
     val builder = StreamsBuilder()
     val cdc = builder.mongoOpLog(source)
 
-    val gardenTable = cdc.toKTable<Garden>(
+    val gardenTable = cdc.toKTable<MongoGarden>(
         materializedAs<String, String?, KeyValueStore<Bytes, ByteArray>>("$source.table")
             .withCachingDisabled()
     )
