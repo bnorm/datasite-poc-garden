@@ -1,6 +1,9 @@
 rootProject.name = "datasite-poc-garden"
 
 import(":auditing:common")
+import(":iot:common")
+import(":iot:gateway")
+import(":iot:simulator")
 import(":processor")
 import(":reporting:common")
 import(":reporting:service")

@@ -30,6 +30,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_JMX_PORT: 9101
       KAFKA_LOG_CLEANUP_POLICY: compact
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
 
   schema-registry:
     image: confluentinc/cp-schema-registry:6.0.0

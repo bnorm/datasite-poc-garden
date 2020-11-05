@@ -1,0 +1,10 @@
+POST http://localhost:8080/api/v1/iot
+Content-Type: application/json
+
+{
+  "timestamp": 1604339746,
+  "sensorId": "1",
+  "value": 65.12345
+}
+
+###
