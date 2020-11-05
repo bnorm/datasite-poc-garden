@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Bean
 @SpringBootApplication
 class DatasiteGardenApplication {
 	@get:Bean
-	val json: Json = Json.Default
+	val json: Json = Json {
+		encodeDefaults = true
+	}
 }
 
 fun main(args: Array<String>) {
