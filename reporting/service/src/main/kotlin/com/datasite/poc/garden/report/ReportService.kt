@@ -47,7 +47,7 @@ class ReportService(
         _reportFlow.emit(getMostPopularGardensReport())
     }
 
-    @KafkaListener(topics = ["auditing.garden.events"])
+    @KafkaListener(topics = ["audit.garden.event"])
     fun gardenAudits(@Payload message: String) = runBlocking {
         log.info("Processing audit event {}", message)
         val event = json.decodeFromString<AuditEvent>(message)

@@ -3,14 +3,15 @@ package com.datasite.poc.garden.usecase
 import com.datasite.poc.garden.audit.dto.AuditEvent
 import com.datasite.poc.garden.audit.dto.EnrichedAuditEvent
 import com.datasite.poc.garden.dto.Garden
-import com.datasite.poc.garden.event.MongoUuid
 import com.datasite.poc.garden.event.KotlinxSerde
 import com.datasite.poc.garden.event.MongoGarden
+import com.datasite.poc.garden.event.MongoUuid
 import com.datasite.poc.garden.event.filterIsInstance
 import com.datasite.poc.garden.event.jsonFormat
 import com.datasite.poc.garden.event.mongoOpLog
 import com.datasite.poc.garden.event.toGarden
 import com.datasite.poc.garden.event.toKTable
+import java.util.*
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -19,11 +20,10 @@ import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.kstream.Consumed
-import java.util.*
 
 suspend fun main() {
     val mongoCdcSource = "mongo.datasite-poc.gardens"
-    val auditSource = "auditing.garden.events"
+    val auditSource = "audit.garden.event"
 
     val props = Properties()
     props[StreamsConfig.APPLICATION_ID_CONFIG] = "datasite-audit-reprocess"
