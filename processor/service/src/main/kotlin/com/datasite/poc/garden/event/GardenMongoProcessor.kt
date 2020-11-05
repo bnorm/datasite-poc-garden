@@ -2,7 +2,6 @@ package com.datasite.poc.garden.event
 
 import com.datasite.poc.garden.audit.dto.AuditEvent
 import com.datasite.poc.garden.audit.dto.EnrichedAuditEvent
-import com.datasite.poc.garden.audit.dto.MongoGarden
 import org.apache.kafka.streams.kstream.KStream
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Input

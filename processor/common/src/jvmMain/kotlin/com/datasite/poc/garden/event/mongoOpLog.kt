@@ -1,6 +1,5 @@
 package com.datasite.poc.garden.event
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
@@ -12,33 +11,15 @@ import org.apache.kafka.streams.kstream.KTable
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.state.KeyValueStore
 
-@Serializable
-data class MongoOpLogValue(
-    val op: String,
-    val after: String? = null,
-    val patch: String? = null,
-    val transaction: Transaction? = null,
-) {
-    @Serializable
-    data class Transaction(
-        val id: String,
-        val total_order: Long,
-        val data_collection_order: Long,
-    )
-}
-
-@Serializable
-data class MongoOpLogKey(
-    val id: String
-)
-
 fun StreamsBuilder.mongoOpLog(topic: String): KStream<MongoOpLogKey, MongoOpLogValue?> =
     stream(topic, Consumed.with(KotlinxSerde(), KotlinxSerde()))
 
 inline fun <reified V> KStream<MongoOpLogKey, MongoOpLogValue?>.toKTable(
-    materialized: Materialized<String, String, KeyValueStore<Bytes, ByteArray>>? = null
+    materialized: Materialized<String, String, KeyValueStore<Bytes, ByteArray>>? = null,
+    crossinline keyTransformer: (key: MongoOpLogKey) -> String = { jsonFormat.parseToJsonElement(it.id).toString() },
+    crossinline valueTransformer: (value: String?) -> V? = { it?.let { jsonFormat.decodeFromString<V>(it) } }
 ): KTable<String, V?> =
-    selectKey { key, _ -> jsonFormat.parseToJsonElement(key.id).toString() }
+    selectKey { key, _ -> keyTransformer(key) }
         .groupByKey()
         .let {
             if (materialized != null) {
@@ -54,7 +35,7 @@ inline fun <reified V> KStream<MongoOpLogKey, MongoOpLogValue?>.toKTable(
                 )
             }
         }
-        .mapValues { _, value -> value?.let { jsonFormat.decodeFromString<V>(it) } }
+        .mapValues { _, value -> valueTransformer(value) }
 
 fun merge(
     oldValue: String?,

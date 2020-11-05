@@ -1,7 +1,7 @@
 package com.datasite.poc.garden.report
 
 import com.datasite.poc.garden.audit.dto.AuditEvent
-import com.datasite.poc.garden.audit.dto.MongoGarden
+import com.datasite.poc.garden.dto.Garden
 import com.datasite.poc.garden.report.dto.MostPopularGardensReport
 import com.datasite.poc.garden.report.dto.Report
 import com.datasite.poc.garden.report.dto.UsersFavoriteGardenReport
@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class ReportService(
@@ -39,9 +38,8 @@ class ReportService(
     fun gardenTableChanges(@Payload message: String?) = runBlocking {
         log.info("Processing Mongo gardens table change {}", message)
         if (message != null) {
-            val garden = json.decodeFromString<MongoGarden>(message)
-            val uuid = Base64.getDecoder().decode(garden.id.binary).toString()
-            repository.upsertGarden(GardenEntity(uuid, garden.name))
+            val garden = json.decodeFromString<Garden>(message)
+            repository.upsertGarden(GardenEntity(garden.id.toString(), garden.name))
         } else {
             // TODO get key and delete garden
         }
