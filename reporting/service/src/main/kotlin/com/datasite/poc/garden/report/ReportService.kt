@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class ReportService(
@@ -39,7 +40,8 @@ class ReportService(
         log.info("Processing Mongo gardens table change {}", message)
         if (message != null) {
             val garden = json.decodeFromString<MongoGarden>(message)
-            repository.upsertGarden(GardenEntity(garden.id.oid, garden.name))
+            val uuid = Base64.getDecoder().decode(garden.id.binary).toString()
+            repository.upsertGarden(GardenEntity(uuid, garden.name))
         } else {
             // TODO get key and delete garden
         }

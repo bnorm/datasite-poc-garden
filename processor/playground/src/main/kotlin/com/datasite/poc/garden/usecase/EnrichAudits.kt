@@ -3,7 +3,7 @@ package com.datasite.poc.garden.usecase
 import com.datasite.poc.garden.audit.dto.AuditEvent
 import com.datasite.poc.garden.audit.dto.EnrichedAuditEvent
 import com.datasite.poc.garden.audit.dto.MongoGarden
-import com.datasite.poc.garden.audit.dto.ObjectId
+import com.datasite.poc.garden.audit.dto.MongoUuid
 import com.datasite.poc.garden.event.KotlinxSerde
 import com.datasite.poc.garden.event.filterIsInstance
 import com.datasite.poc.garden.event.jsonFormat
@@ -41,7 +41,7 @@ suspend fun main() {
 
     audits
         .filterIsInstance<String, AuditEvent.GardenAccess>()
-        .selectKey { _, value -> jsonFormat.encodeToString(ObjectId(value.gardenId)) }
+        .selectKey { _, value -> jsonFormat.encodeToString(MongoUuid(value.gardenId)) }
         .join<MongoGarden, EnrichedAuditEvent>(mongoTable) { audit, garden ->
             EnrichedAuditEvent.GardenAccess(audit.userId, garden)
         }

@@ -4,7 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Garden(
-    val id: String,
+    @Serializable(with = UuidSerializer::class)
+    val id: Uuid,
     val name: String,
 )
 

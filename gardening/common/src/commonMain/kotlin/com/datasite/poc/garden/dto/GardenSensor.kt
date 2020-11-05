@@ -3,21 +3,23 @@ package com.datasite.poc.garden.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
+data class GardenSensor(
     @Serializable(with = UuidSerializer::class)
     val id: Uuid,
     val name: String,
-    val gardens: List<Garden>
+    val garden: Garden,
 )
 
 @Serializable
-data class UserPrototype(
+data class GardenSensorPrototype(
     val name: String,
-    val gardenIds: List<@Serializable(with = UuidSerializer::class) Uuid> = emptyList(),
+    @Serializable(with = UuidSerializer::class)
+    val gardenId: Uuid,
 )
 
 @Serializable
-data class UserPatch(
+data class GardenSensorPatch(
     val name: String? = null,
-    val gardenIds: List<@Serializable(with = UuidSerializer::class) Uuid>? = null,
+    @Serializable(with = UuidSerializer::class)
+    val gardenId: Uuid? = null,
 )

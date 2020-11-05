@@ -1,6 +1,7 @@
 package com.datasite.poc.garden
 
 import com.datasite.poc.garden.audit.dto.AuditEvent
+import com.datasite.poc.garden.dto.Uuid
 import com.datasite.poc.garden.user.currentUser
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -8,6 +9,7 @@ import org.springframework.data.mongodb.currentClientSession
 import org.springframework.data.mongodb.transactionId
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class AuditService(
@@ -19,7 +21,7 @@ class AuditService(
         audit(user.id, AuditEvent.AllGardensAccess(user.id))
     }
 
-    suspend fun auditGardenAccess(gardenId: String) {
+    suspend fun auditGardenAccess(gardenId: UUID) {
         val user = currentUser()
         audit(user.id, AuditEvent.GardenAccess(user.id, gardenId))
     }
@@ -42,8 +44,36 @@ class AuditService(
         audit(user.id, AuditEvent.GardenDelete(transactionId, user.id))
     }
 
-    private fun audit(key: String, audit: AuditEvent) {
-        kafkaTemplate.send("auditing.garden.events", key, json.encodeToString(audit))
+    suspend fun auditAllGardenSensorsAccess() {
+        val user = currentUser()
+        audit(user.id, AuditEvent.AllGardenSensorsAccess(user.id))
+    }
+
+    suspend fun auditGardenSensorAccess(sensorId: UUID) {
+        val user = currentUser()
+        audit(user.id, AuditEvent.GardenSensorAccess(user.id, sensorId))
+    }
+
+    suspend fun auditGardenSensorCreate() {
+        val user = currentUser()
+        val transactionId = currentTransactionId()
+        audit(user.id, AuditEvent.GardenSensorCreate(transactionId, user.id))
+    }
+
+    suspend fun auditGardenSensorUpdate() {
+        val user = currentUser()
+        val transactionId = currentTransactionId()
+        audit(user.id, AuditEvent.GardenSensorUpdate(transactionId, user.id))
+    }
+
+    suspend fun auditGardenSensorDelete() {
+        val user = currentUser()
+        val transactionId = currentTransactionId()
+        audit(user.id, AuditEvent.GardenSensorDelete(transactionId, user.id))
+    }
+
+    private fun audit(key: Uuid, audit: AuditEvent) {
+        kafkaTemplate.send("audit.garden.events", key.toString(), json.encodeToString(audit))
     }
 
     private suspend fun currentTransactionId(): String {

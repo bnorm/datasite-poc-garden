@@ -1,8 +1,8 @@
 package com.datasite.poc.garden
 
-import com.datasite.poc.garden.dto.Garden
-import com.datasite.poc.garden.dto.GardenPatch
-import com.datasite.poc.garden.dto.GardenPrototype
+import com.datasite.poc.garden.dto.User
+import com.datasite.poc.garden.dto.UserPatch
+import com.datasite.poc.garden.dto.UserPrototype
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactive.awaitSingleOrNull
 import org.springframework.http.HttpStatus
@@ -18,33 +18,33 @@ import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
-@RequestMapping("/api/v1/gardens")
-class GardenController(
-    private val service: GardenService,
+@RequestMapping("/api/v1/users")
+class UserController(
+    private val service: UserService,
 ) {
     @GetMapping
-    suspend fun getAllGardens(): List<Garden> = service.getAllGardens()
+    suspend fun getAllUsers(): List<User> = service.getAllUsers()
 
     @GetMapping("/{id}")
-    suspend fun getGarden(
+    suspend fun getUser(
         @PathVariable id: UUID
-    ): Garden = service.getGarden(id)
-        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown Garden with id=$id")
+    ): User = service.getUser(id)
+        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown User with id=$id")
 
     @PostMapping
-    suspend fun createGarden(
-        @RequestBody prototype: GardenPrototype
-    ): Garden = service.createGarden(prototype).awaitSingle()
+    suspend fun createUser(
+        @RequestBody prototype: UserPrototype
+    ): User = service.createUser(prototype).awaitSingle()
 
     @PutMapping("/{id}")
-    suspend fun createGarden(
+    suspend fun createUser(
         @PathVariable id: UUID,
-        @RequestBody patch: GardenPatch
-    ): Garden = service.updateGarden(id, patch).awaitSingleOrNull()
-        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown Garden with id=$id")
+        @RequestBody patch: UserPatch
+    ): User = service.updateUser(id, patch).awaitSingleOrNull()
+        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown User with id=$id")
 
     @DeleteMapping("/{id}")
-    suspend fun deleteGarden(
+    suspend fun deleteUser(
         @PathVariable id: UUID
-    ): Unit = service.deleteGarden(id).awaitSingle()
+    ): Unit = service.deleteUser(id).awaitSingle()
 }
