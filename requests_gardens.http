@@ -1,10 +1,10 @@
 
 ### Get all gardens
-GET http://localhost:8080/api/v1/gardens
+GET http://localhost:9000/api/v1/gardens
 X-User: {{user_id}}
 
 ### Create a new garden
-POST http://localhost:8080/api/v1/gardens
+POST http://localhost:9000/api/v1/gardens
 X-User: {{user_id}}
 Content-Type: application/json
 
@@ -15,7 +15,7 @@ Content-Type: application/json
 > {% client.global.set("garden_id", response.body.id); %}
 
 ### Update a garden
-PUT http://localhost:8080/api/v1/gardens/{{garden_id}}
+PUT http://localhost:9000/api/v1/gardens/{{garden_id}}
 X-User: {{user_id}}
 Content-Type: application/json
 
@@ -26,11 +26,11 @@ Content-Type: application/json
 > {% client.global.set("garden_id", response.body.id); %}
 
 ### Get a garden
-GET http://localhost:8080/api/v1/gardens/{{garden_id}}
+GET http://localhost:9000/api/v1/gardens/{{garden_id}}
 X-User: {{user_id}}
 
 > {% client.global.set("garden_id", response.body.id); %}
 
 ### Delete a garden
-DELETE http://localhost:8080/api/v1/gardens/{{garden_id}}
+DELETE http://localhost:9000/api/v1/gardens/{{garden_id}}
 X-User: {{user_id}}
