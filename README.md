@@ -1,3 +1,5 @@
+# Architecture
+![garden-architecture](docs/garden-architecture.png)
 
 ### MongoDB configuration
 
