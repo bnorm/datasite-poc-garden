@@ -1,4 +1,2 @@
-server:
-  port: 9001
-
-debug: true
+server.port: 9011
+iot.gateway.url: "http://localhost:9010/api/v1/iot"

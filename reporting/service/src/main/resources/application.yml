@@ -1,5 +1,4 @@
-server:
-  port: 9005
+server.port: 9030
 
 spring:
   r2dbc:

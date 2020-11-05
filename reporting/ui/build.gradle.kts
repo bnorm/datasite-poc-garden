@@ -16,9 +16,9 @@ kotlin {
             runTask {
                 // TODO: use dsl after KT-32016 will be fixed
                 devServer = KotlinWebpackConfig.DevServer(
-                        port = 9004,
+                        port = 9031,
                         proxy = mapOf(
-                                "/api/v1/**" to mapOf("target" to "ws://localhost:9005", "ws" to true)
+                                "/api/v1/**" to mapOf("target" to "ws://localhost:9030", "ws" to true)
                         ),
                         contentBase = listOf("$projectDir/src/main/resources")
                 )
