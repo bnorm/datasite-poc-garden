@@ -14,6 +14,7 @@ import org.springframework.data.r2dbc.core.await
 import org.springframework.data.r2dbc.core.awaitOne
 import org.springframework.data.r2dbc.core.flow
 import org.springframework.stereotype.Repository
+import java.util.*
 import javax.annotation.PostConstruct
 
 @Repository
@@ -62,7 +63,7 @@ ON CONFLICT (id) DO UPDATE SET name = $2
             .bind(0, gardenId).await()
     }
 
-    suspend fun incrementUserGardenViewCount(userId: String, gardenId: String): UserGardenViewEntity {
+    suspend fun incrementUserGardenViewCount(userId: UUID, gardenId: UUID): UserGardenViewEntity {
         return client.execute(
             """--
 INSERT INTO $USER_GARDEN_VIEW_TABLE (user_id, garden_id, view_count)

@@ -11,6 +11,7 @@ import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
+import java.util.*
 
 @Service
 class GardenService(
@@ -24,10 +25,9 @@ class GardenService(
     }
 
     suspend fun getGarden(
-        id: String
+        id: UUID
     ): Garden? {
-        val objectId = id.toObjectId() ?: return null
-        val entity = repository.getGarden(objectId) ?: return null
+        val entity = repository.getGarden(id) ?: return null
         auditService.auditGardenAccess(id)
         return entity.toGarden()
     }
@@ -43,23 +43,21 @@ class GardenService(
 
     @Transactional // suspend should work in spring boot 2.4
     fun updateGarden(
-        id: String,
+        id: UUID,
         patch: GardenPatch
     ): Mono<Garden?> = mono {
-        val objectId = id.toObjectId() ?: return@mono null
-        val entity = repository.updateGarden(objectId, patch) ?: return@mono null
+        val entity = repository.updateGarden(id, patch) ?: return@mono null
         auditService.auditGardenUpdate()
         return@mono entity.toGarden()
     }
 
     @Transactional // suspend should work in spring boot 2.4
     fun deleteGarden(
-        id: String
+        id: UUID
     ): Mono<Unit> = mono {
-        val objectId = id.toObjectId() ?: return@mono null
-        repository.deleteGarden(objectId)
+        repository.deleteGarden(id)
         auditService.auditGardenDelete()
     }
 }
 
-private fun String.toObjectId() = if (ObjectId.isValid(this)) ObjectId(this) else null
+fun String.toObjectId() = if (ObjectId.isValid(this)) ObjectId(this) else null
