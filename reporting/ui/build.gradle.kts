@@ -18,7 +18,6 @@ kotlin {
                 devServer = KotlinWebpackConfig.DevServer(
                         port = 9004,
                         proxy = mapOf(
-                                "/api/v1/**" to "http://localhost:9005",
                                 "/api/v1/**" to mapOf("target" to "ws://localhost:9005", "ws" to true)
                         ),
                         contentBase = listOf("$projectDir/src/main/resources")
