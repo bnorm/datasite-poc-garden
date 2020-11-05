@@ -31,6 +31,7 @@ curl -i -X POST \
     "mongodb.hosts" : "rs0/mongo:27017",
     "mongodb.name" : "mongo",
     "mongodb.members.auto.discover" : false,
+    "collection.whitelist" : "datasite-poc.*",
     "provide.transaction.metadata" : true,
     "database.history.kafka.bootstrap.servers" : "kafka:9092"
   }
