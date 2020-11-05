@@ -16,6 +16,7 @@ kotlin {
             dependencies {
                 api(project(":gardening:gardening-common"))
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+                api("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
             }
         }
     }

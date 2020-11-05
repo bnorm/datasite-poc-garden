@@ -18,58 +18,58 @@ class AuditService(
 ) {
     suspend fun auditAllGardensAccess() {
         val user = currentUser()
-        audit(user.id, AuditEvent.AllGardensAccess(user.id))
+        audit(user.id, AuditEvent.AllGardensAccess(userId = user.id))
     }
 
     suspend fun auditGardenAccess(gardenId: UUID) {
         val user = currentUser()
-        audit(user.id, AuditEvent.GardenAccess(user.id, gardenId))
+        audit(user.id, AuditEvent.GardenAccess(userId = user.id, gardenId = gardenId))
     }
 
     suspend fun auditGardenCreate() {
         val user = currentUser()
         val transactionId = currentTransactionId()
-        audit(user.id, AuditEvent.GardenCreate(transactionId, user.id))
+        audit(user.id, AuditEvent.GardenCreate(transactionId = transactionId, userId = user.id))
     }
 
     suspend fun auditGardenUpdate() {
         val user = currentUser()
         val transactionId = currentTransactionId()
-        audit(user.id, AuditEvent.GardenUpdate(transactionId, user.id))
+        audit(user.id, AuditEvent.GardenUpdate(transactionId = transactionId, userId = user.id))
     }
 
     suspend fun auditGardenDelete() {
         val user = currentUser()
         val transactionId = currentTransactionId()
-        audit(user.id, AuditEvent.GardenDelete(transactionId, user.id))
+        audit(user.id, AuditEvent.GardenDelete(transactionId = transactionId, userId = user.id))
     }
 
     suspend fun auditAllGardenSensorsAccess() {
         val user = currentUser()
-        audit(user.id, AuditEvent.AllGardenSensorsAccess(user.id))
+        audit(user.id, AuditEvent.AllGardenSensorsAccess(userId = user.id))
     }
 
     suspend fun auditGardenSensorAccess(sensorId: UUID) {
         val user = currentUser()
-        audit(user.id, AuditEvent.GardenSensorAccess(user.id, sensorId))
+        audit(user.id, AuditEvent.GardenSensorAccess(userId = user.id, sensorId = sensorId))
     }
 
     suspend fun auditGardenSensorCreate() {
         val user = currentUser()
         val transactionId = currentTransactionId()
-        audit(user.id, AuditEvent.GardenSensorCreate(transactionId, user.id))
+        audit(user.id, AuditEvent.GardenSensorCreate(transactionId = transactionId, userId = user.id))
     }
 
     suspend fun auditGardenSensorUpdate() {
         val user = currentUser()
         val transactionId = currentTransactionId()
-        audit(user.id, AuditEvent.GardenSensorUpdate(transactionId, user.id))
+        audit(user.id, AuditEvent.GardenSensorUpdate(transactionId = transactionId, userId = user.id))
     }
 
     suspend fun auditGardenSensorDelete() {
         val user = currentUser()
         val transactionId = currentTransactionId()
-        audit(user.id, AuditEvent.GardenSensorDelete(transactionId, user.id))
+        audit(user.id, AuditEvent.GardenSensorDelete(transactionId = transactionId, userId = user.id))
     }
 
     private fun audit(key: Uuid, audit: AuditEvent) {
