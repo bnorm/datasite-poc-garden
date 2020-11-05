@@ -1,10 +1,14 @@
 package com.datasite.poc.garden.usecase
 
-import com.datasite.poc.garden.audit.dto.MongoGarden
 import com.datasite.poc.garden.event.KotlinxSerde
+import com.datasite.poc.garden.event.MongoGarden
+import com.datasite.poc.garden.event.MongoUuid
+import com.datasite.poc.garden.event.jsonFormat
 import com.datasite.poc.garden.event.mongoOpLog
+import com.datasite.poc.garden.event.toGarden
 import com.datasite.poc.garden.event.toKTable
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.serialization.decodeFromString
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.utils.Bytes
 import org.apache.kafka.streams.KafkaStreams
@@ -25,9 +29,11 @@ suspend fun main() {
     val builder = StreamsBuilder()
 
     builder.mongoOpLog("mongo.datasite-poc.gardens")
-        .toKTable<MongoGarden>(
+        .toKTable(
             materializedAs<String, String?, KeyValueStore<Bytes, ByteArray>>("mongo.garden.table")
-                .withCachingDisabled()
+                .withCachingDisabled(),
+            keyTransformer = { jsonFormat.decodeFromString<MongoUuid>(it.id).uuid.toString() },
+            valueTransformer = { value -> value?.let { jsonFormat.decodeFromString<MongoGarden>(it).toGarden() } },
         )
         .toStream()
         .to("mongo.garden.table", Produced.valueSerde(KotlinxSerde()))

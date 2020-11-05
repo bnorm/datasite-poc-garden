@@ -2,14 +2,17 @@ package com.datasite.poc.garden.usecase
 
 import com.datasite.poc.garden.audit.dto.AuditEvent
 import com.datasite.poc.garden.audit.dto.EnrichedAuditEvent
-import com.datasite.poc.garden.audit.dto.MongoGarden
-import com.datasite.poc.garden.audit.dto.ObjectId
+import com.datasite.poc.garden.dto.Garden
+import com.datasite.poc.garden.event.MongoUuid
 import com.datasite.poc.garden.event.KotlinxSerde
+import com.datasite.poc.garden.event.MongoGarden
 import com.datasite.poc.garden.event.filterIsInstance
 import com.datasite.poc.garden.event.jsonFormat
 import com.datasite.poc.garden.event.mongoOpLog
+import com.datasite.poc.garden.event.toGarden
 import com.datasite.poc.garden.event.toKTable
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
@@ -37,13 +40,16 @@ suspend fun main() {
     )
 
     // Cannot consume KTable topic as it will compact and hide deleted entities
-    val mongoTable = builder.mongoOpLog(mongoCdcSource).toKTable<MongoGarden>()
+    val mongoTable = builder.mongoOpLog(mongoCdcSource).toKTable<Garden>(
+        keyTransformer = { jsonFormat.decodeFromString<MongoUuid>(it.id).uuid.toString() },
+        valueTransformer = { value -> value?.let { jsonFormat.decodeFromString<MongoGarden>(it).toGarden() } }
+    )
 
     audits
         .filterIsInstance<String, AuditEvent.GardenAccess>()
-        .selectKey { _, value -> jsonFormat.encodeToString(ObjectId(value.gardenId)) }
-        .join<MongoGarden, EnrichedAuditEvent>(mongoTable) { audit, garden ->
-            EnrichedAuditEvent.GardenAccess(audit.userId, garden)
+        .selectKey { _, value -> jsonFormat.encodeToString(value.gardenId) }
+        .join<Garden, EnrichedAuditEvent>(mongoTable) { audit, garden ->
+            EnrichedAuditEvent.GardenAccess(audit.timestamp, audit.userId, garden)
         }
         .foreach { _, value -> println("enriched = $value") }
 

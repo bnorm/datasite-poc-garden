@@ -1,52 +1,112 @@
 package com.datasite.poc.garden.audit.dto
 
-import kotlinx.datetime.Clock.System
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
+import com.datasite.poc.garden.dto.Uuid
+import com.datasite.poc.garden.dto.UuidSerializer
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class AuditEvent {
-    abstract val timestamp: Long
+    abstract val timestamp: Instant
     abstract val transactionId: String?
-    abstract val userId: String
+    abstract val userId: Uuid
 
     @Serializable
     data class AllGardensAccess(
-            override val userId: String,
-            override val timestamp: Long = System.now().toLocalDateTime(TimeZone.UTC).toInstant(TimeZone.UTC).toEpochMilliseconds()
+        @Serializable(with = InstantSerializer::class)
+        override val timestamp: Instant = Clock.System.now(),
+        @Serializable(with = UuidSerializer::class)
+        override val userId: Uuid,
     ) : AuditEvent() {
         override val transactionId: String? = null
     }
 
     @Serializable
     data class GardenAccess(
-            override val userId: String,
-            val gardenId: String,
-            override val timestamp: Long = System.now().toLocalDateTime(TimeZone.UTC).toInstant(TimeZone.UTC).toEpochMilliseconds()
+        @Serializable(with = InstantSerializer::class)
+        override val timestamp: Instant = Clock.System.now(),
+        @Serializable(with = UuidSerializer::class)
+        override val userId: Uuid,
+        @Serializable(with = UuidSerializer::class)
+        val gardenId: Uuid,
     ) : AuditEvent() {
         override val transactionId: String? = null
     }
 
     @Serializable
     data class GardenCreate(
-            override val transactionId: String,
-            override val userId: String,
-            override val timestamp: Long = System.now().toLocalDateTime(TimeZone.UTC).toInstant(TimeZone.UTC).toEpochMilliseconds()
+        @Serializable(with = InstantSerializer::class)
+        override val timestamp: Instant = Clock.System.now(),
+        override val transactionId: String,
+        @Serializable(with = UuidSerializer::class)
+        override val userId: Uuid,
     ) : AuditEvent()
 
     @Serializable
     data class GardenUpdate(
-            override val transactionId: String,
-            override val userId: String,
-            override val timestamp: Long = System.now().toLocalDateTime(TimeZone.UTC).toInstant(TimeZone.UTC).toEpochMilliseconds()
+        @Serializable(with = InstantSerializer::class)
+        override val timestamp: Instant = Clock.System.now(),
+        override val transactionId: String,
+        @Serializable(with = UuidSerializer::class)
+        override val userId: Uuid,
     ) : AuditEvent()
 
     @Serializable
     data class GardenDelete(
-            override val transactionId: String,
-            override val userId: String,
-            override val timestamp: Long = System.now().toLocalDateTime(TimeZone.UTC).toInstant(TimeZone.UTC).toEpochMilliseconds()
+        @Serializable(with = InstantSerializer::class)
+        override val timestamp: Instant = Clock.System.now(),
+        override val transactionId: String,
+        @Serializable(with = UuidSerializer::class)
+        override val userId: Uuid,
+    ) : AuditEvent()
+
+    @Serializable
+    data class AllGardenSensorsAccess(
+        @Serializable(with = InstantSerializer::class)
+        override val timestamp: Instant = Clock.System.now(),
+        @Serializable(with = UuidSerializer::class)
+        override val userId: Uuid,
+    ) : AuditEvent() {
+        override val transactionId: String? = null
+    }
+
+    @Serializable
+    data class GardenSensorAccess(
+        @Serializable(with = InstantSerializer::class)
+        override val timestamp: Instant = Clock.System.now(),
+        @Serializable(with = UuidSerializer::class)
+        override val userId: Uuid,
+        @Serializable(with = UuidSerializer::class)
+        val sensorId: Uuid,
+    ) : AuditEvent() {
+        override val transactionId: String? = null
+    }
+
+    @Serializable
+    data class GardenSensorCreate(
+        @Serializable(with = InstantSerializer::class)
+        override val timestamp: Instant = Clock.System.now(),
+        override val transactionId: String,
+        @Serializable(with = UuidSerializer::class)
+        override val userId: Uuid,
+    ) : AuditEvent()
+
+    @Serializable
+    data class GardenSensorUpdate(
+        @Serializable(with = InstantSerializer::class)
+        override val timestamp: Instant = Clock.System.now(),
+        override val transactionId: String,
+        @Serializable(with = UuidSerializer::class)
+        override val userId: Uuid,
+    ) : AuditEvent()
+
+    @Serializable
+    data class GardenSensorDelete(
+        @Serializable(with = InstantSerializer::class)
+        override val timestamp: Instant = Clock.System.now(),
+        override val transactionId: String,
+        @Serializable(with = UuidSerializer::class)
+        override val userId: Uuid,
     ) : AuditEvent()
 }

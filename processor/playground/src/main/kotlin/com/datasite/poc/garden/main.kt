@@ -1,6 +1,6 @@
 package com.datasite.poc.garden
 
-import com.datasite.poc.garden.audit.dto.MongoGarden
+import com.datasite.poc.garden.event.MongoGarden
 import com.datasite.poc.garden.event.mongoOpLog
 import com.datasite.poc.garden.event.toKTable
 import kotlinx.coroutines.awaitCancellation
