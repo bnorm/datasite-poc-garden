@@ -5,6 +5,10 @@ plugins {
     id("com.bnorm.react.kotlin-react-function")
 }
 
+repositories {
+    maven { setUrl("https://dl.bintray.com/subroh0508/maven") }
+}
+
 kotlin {
     js(IR) {
         browser {
@@ -12,9 +16,12 @@ kotlin {
             runTask {
                 // TODO: use dsl after KT-32016 will be fixed
                 devServer = KotlinWebpackConfig.DevServer(
-                    port = 8081,
-                    proxy = mapOf("/api/v1/**" to "http://localhost:8080"),
-                    contentBase = listOf("$projectDir/src/main/resources")
+                        port = 9004,
+                        proxy = mapOf(
+                                "/api/v1/**" to "http://localhost:9005",
+                                "/api/v1/**" to mapOf("target" to "ws://localhost:9005", "ws" to true)
+                        ),
+                        contentBase = listOf("$projectDir/src/main/resources")
                 )
                 outputFileName = "web.js"
             }
@@ -32,10 +39,12 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization-js:1.4.1")
 
     implementation("com.bnorm.react:kotlin-react-function:0.2.1")
-    implementation("org.jetbrains:kotlin-extensions:1.0.1-pre.126-kotlin-1.4.10")
-    implementation("org.jetbrains:kotlin-react:17.0.0-pre.126-kotlin-1.4.10")
-    implementation("org.jetbrains:kotlin-react-dom:17.0.0-pre.126-kotlin-1.4.10")
-    implementation("org.jetbrains:kotlin-react-router-dom:5.2.0-pre.126-kotlin-1.4.10")
+    implementation("org.jetbrains:kotlin-extensions:1.0.1-pre.129-kotlin-1.4.10")
+    implementation("org.jetbrains:kotlin-react:17.0.0-pre.129-kotlin-1.4.10")
+    implementation("org.jetbrains:kotlin-react-dom:17.0.0-pre.129-kotlin-1.4.10")
+    implementation("org.jetbrains:kotlin-react-router-dom:5.2.0-pre.129-kotlin-1.4.10")
+
+    implementation("net.subroh0508.kotlinmaterialui:core:0.5.3")
 }
 
 tasks.register<Sync>("jsBundle") {
