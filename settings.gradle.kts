@@ -6,8 +6,9 @@ import(":reporting:common")
 import(":reporting:service")
 import(":reporting:ui")
 import(":service")
-include(":iot:gateway")
-include(":iot:simulator")
+import(":iot:gateway")
+import(":iot:simulator")
+import(":iot:common")
 
 fun import(name: String) {
     val projectName = name.replace(":", "-").removePrefix("-")

@@ -1,6 +1,6 @@
 package com.datasite.poc.garden
 
-import com.datasite.poc.garden.dto.SensorReading
+import com.datasite.poc.garden.iot.dto.SensorReading
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping

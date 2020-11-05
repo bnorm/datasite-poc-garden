@@ -1,4 +1,4 @@
-package com.datasite.poc.garden.dto
+package com.datasite.poc.garden.iot.dto
 
 import kotlinx.serialization.Serializable
 

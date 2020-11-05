@@ -1,6 +1,6 @@
 package com.datasite.poc.garden
 
-import com.datasite.poc.garden.dto.SensorReading
+import com.datasite.poc.garden.iot.dto.SensorReading
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset

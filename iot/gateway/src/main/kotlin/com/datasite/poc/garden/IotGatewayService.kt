@@ -1,6 +1,6 @@
 package com.datasite.poc.garden
 
-import com.datasite.poc.garden.dto.SensorReading
+import com.datasite.poc.garden.iot.dto.SensorReading
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.slf4j.Logger
@@ -15,16 +15,20 @@ class IotGatewayService(
 
     val logger: Logger = LoggerFactory.getLogger(IotGatewayService::class.java)
 
+    companion object {
+        const val IOT_GARDEN_READING_TOPIC = "iot.sensor.reading"
+    }
+
     suspend fun process(sensorReading: SensorReading) {
         val sensorReadingAsJson: String = Json.encodeToString(sensorReading)
-        logger.info("sending sensor reading to kafka : {}", sensorReadingAsJson)
-        kafkaTemplate.send("iot.garden.reading", sensorReading.sensorId, sensorReadingAsJson).addCallback(
+        logger.info("sending sensor reading to kafka topic {} : {}", IOT_GARDEN_READING_TOPIC, sensorReadingAsJson)
+
+        kafkaTemplate.send(IOT_GARDEN_READING_TOPIC, sensorReading.sensorId, sensorReadingAsJson).addCallback(
                 { sendResult ->
                     logger.info("successfully sent : partition {},  offset : {}",
                             sendResult?.recordMetadata?.partition(),
                             sendResult?.recordMetadata?.offset()
                     )
-
                 },
                 { error ->
                     logger.error(error.message)
