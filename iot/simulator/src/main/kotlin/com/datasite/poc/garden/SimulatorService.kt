@@ -6,6 +6,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -14,7 +15,9 @@ import reactor.netty.http.client.HttpClient
 import kotlin.random.Random
 
 @Service
-class SimulatorService {
+class SimulatorService(
+        @Value(value = "\${iot.gateway.url}") private val iotGatewayUrl: String,
+) {
     val logger: Logger = LoggerFactory.getLogger(SimulatorService::class.java)
 
     val sensors = listOf(
@@ -33,7 +36,7 @@ class SimulatorService {
         sensors.forEach { sensor ->
             webClient
                     .post()
-                    .uri(URI.create("http://localhost:9000/api/v1/iot"))
+                    .uri(URI.create(iotGatewayUrl))
                     .bodyValue(
                             SensorReading(
                                     timestamp = OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond(),

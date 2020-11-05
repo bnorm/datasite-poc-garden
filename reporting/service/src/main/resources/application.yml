@@ -1,5 +1,4 @@
-server:
-  port: 8088
+server.port: 9030
 
 spring:
   r2dbc:

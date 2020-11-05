@@ -1,5 +1,4 @@
-server:
-  port: 0 # Doesn't matter what port
+server.port: 9020
 
 spring:
   kafka:

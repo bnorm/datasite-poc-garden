@@ -1,6 +1,17 @@
 # Architecture
 ![garden-architecture](docs/garden-architecture.png)
 
+
+# Port configuration
+|application|port|
+|---|---|
+|gardening-service|9000|
+|iot-gateway|9010|
+|iot-simulator|9011|
+|processor-service|9020|
+|reporting-service|9030|
+|reporting-ui|9031|
+
 ### MongoDB configuration
 
 After starting the Docker compose file, run the following commands to

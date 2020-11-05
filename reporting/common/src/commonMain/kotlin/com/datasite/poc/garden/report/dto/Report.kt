@@ -28,8 +28,9 @@ data class UsersFavoriteGardenReport(
 
     @Serializable
     data class Metric(
-        val user: User,
-        val garden: Garden,
-        val viewCount: Long
+            val user: User,
+            val garden: Garden,
+            val viewCount: Long
     )
 }
+
