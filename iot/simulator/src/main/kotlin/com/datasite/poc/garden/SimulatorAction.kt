@@ -7,4 +7,5 @@ enum class SimulatorAction(
     UserAccess(10),
     MoveSensor(5),
     RenameGarden(2),
+    RenameSensor(2),
 }

@@ -107,6 +107,12 @@ class SimulatorService(
                 logger.info("Renaming garden: name={} garden={}", name, garden)
                 updateGarden(user, garden.id, GardenPatch(name = name))
             }
+            SimulatorAction.RenameSensor -> {
+                val garden = getAllGardenSensors(user).random()
+                val name = nextSensorName()
+                logger.info("Renaming sensor: name={} garden={}", name, garden)
+                updateGardenSensor(user, garden.id, GardenSensorPatch(name = name))
+            }
             SimulatorAction.MoveSensor -> {
                 val sensor = getAllGardenSensors(user).random()
                 val garden = getAllGardens(user).filter { it.id != sensor.garden.id }.random()
