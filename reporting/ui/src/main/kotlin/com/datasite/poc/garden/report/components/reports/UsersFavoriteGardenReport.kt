@@ -17,10 +17,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.serialization.decodeFromString
+import materialui.components.list.list
+import materialui.components.listitem.listItem
+import materialui.components.listitemtext.listItemText
 import react.RBuilder
 import react.dom.div
-import react.dom.li
-import react.dom.ul
 import react.useState
 
 @Suppress("FunctionName")
@@ -30,23 +31,25 @@ fun RBuilder.UsersFavoriteGardenReport() {
     useAsync(emptyList()) {
         client.ws(path = "/api/v1/reports?reports=UsersFavoriteGarden") {
             val initial =
-                client.get<UsersFavoriteGardenReport>(path = "/api/v1/reports/favorite")
+                    client.get<UsersFavoriteGardenReport>(path = "/api/v1/reports/favorite")
             incoming.consumeAsFlow()
-                .filterIsInstance<Frame.Text>()
-                .map { json.decodeFromString<Report>(it.readText()) }
-                .filterIsInstance<UsersFavoriteGardenReport>()
-                .onStart { emit(initial) }
-                .onCompletion { it?.printStackTrace() }
-                .collect { report = it }
+                    .filterIsInstance<Frame.Text>()
+                    .map { json.decodeFromString<Report>(it.readText()) }
+                    .filterIsInstance<UsersFavoriteGardenReport>()
+                    .onStart { emit(initial) }
+                    .onCompletion { it?.printStackTrace() }
+                    .collect { report = it }
         }
     }
 
     val localReport = report
     if (localReport != null) {
-        ul {
+        list {
             for (metric in localReport.metrics) {
-                li {
-                    +"${metric.user.name} has viewed ${metric.garden.name}, ${metric.viewCount} time(s)!"
+                listItem {
+                    listItemText {
+                        +"${metric.user.name} has viewed ${metric.garden.name}, ${metric.viewCount} time(s)!"
+                    }
                 }
             }
         }

@@ -1,34 +1,24 @@
 package com.datasite.poc.garden.report.components
 
 import com.bnorm.react.RFunction
+import com.datasite.poc.garden.report.components.reports.MostPopularGardensReport
+import com.datasite.poc.garden.report.components.reports.UsersFavoriteGardenReport
+import materialui.components.grid.grid
 import react.RBuilder
-import react.dom.div
-import react.dom.h1
-import react.dom.li
-import react.dom.ul
-import react.router.dom.routeLink
-
 
 @Suppress("FunctionName")
 @RFunction
 fun RBuilder.Reports() {
-
-    div {
-        h1 {
-            +"Pick your report!"
+    grid {
+        attrs.container = true
+        attrs.spacing(4)
+        grid {
+            attrs.item = true
+            ReportCard(name = "Favorite Gardens", report = { UsersFavoriteGardenReport() })
         }
-        ul {
-            li {
-                routeLink(to = "/reports/favorite") {
-                    +"favorite"
-                }
-            }
-            li {
-                routeLink(to = "/reports/popular") {
-                    +"popular"
-                }
-            }
+        grid {
+            attrs.item = true
+            ReportCard(name = "Popular Gardens", report = { MostPopularGardensReport() })
         }
-
     }
 }

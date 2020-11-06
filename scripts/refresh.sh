@@ -1,7 +1,8 @@
 #!/bin/bash
 
 echo "> destroying docker-compose..."
-docker-compose rm -f -s
+docker-compose rm -f -s -v
+docker volume prune -f
 
 docker-compose up -d
 

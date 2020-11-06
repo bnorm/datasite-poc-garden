@@ -17,10 +17,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.serialization.decodeFromString
+import materialui.components.list.list
+import materialui.components.listitem.listItem
+import materialui.components.listitemtext.listItemText
 import react.RBuilder
 import react.dom.div
-import react.dom.li
-import react.dom.ul
 import react.useState
 
 
@@ -43,10 +44,12 @@ fun RBuilder.MostPopularGardensReport() {
 
     val localReport = report
     if (localReport != null) {
-        ul {
+        list {
             for (metric in localReport.metrics) {
-                li {
-                    +"${metric.garden.name} has been viewed ${metric.viewCount} time(s)!"
+                listItem {
+                    listItemText {
+                        +"${metric.garden.name} has been viewed ${metric.viewCount} time(s)!"
+                    }
                 }
             }
         }
