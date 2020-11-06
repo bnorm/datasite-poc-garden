@@ -139,7 +139,7 @@ SELECT garden.id             AS id,
 FROM $USER_GARDEN_VIEW_TABLE views
          INNER JOIN $GARDEN_TABLE garden ON views.garden_id = garden.id
 GROUP BY garden.id, garden.name
-ORDER BY 2 DESC
+ORDER BY 3 DESC
 LIMIT $1
 """
         ).bind(0, limit).asType<GardenViewCountSelectRow>().fetch().flow()
