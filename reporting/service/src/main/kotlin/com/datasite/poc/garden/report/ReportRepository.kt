@@ -1,11 +1,16 @@
 package com.datasite.poc.garden.report
 
 import com.datasite.poc.garden.report.entity.GARDEN_SENSOR_ACCUMULATION
+import com.datasite.poc.garden.report.entity.GARDEN_SENSOR_TABLE
 import com.datasite.poc.garden.report.entity.GARDEN_TABLE
 import com.datasite.poc.garden.report.entity.GardenPgEntity
 import com.datasite.poc.garden.report.entity.GardenSensorAccumulationPgEntity
+import com.datasite.poc.garden.report.entity.GardenSensorPgEntity
 import com.datasite.poc.garden.report.entity.GardenSensorTotalSelectRow
 import com.datasite.poc.garden.report.entity.GardenViewCountSelectRow
+import com.datasite.poc.garden.report.entity.SENSOR_ACCUMULATION
+import com.datasite.poc.garden.report.entity.SensorAccumulationPgEntity
+import com.datasite.poc.garden.report.entity.SensorTotalSelectRow
 import com.datasite.poc.garden.report.entity.USER_GARDEN_VIEW_TABLE
 import com.datasite.poc.garden.report.entity.USER_TABLE
 import com.datasite.poc.garden.report.entity.UserGardenViewCountSelectRow
@@ -50,6 +55,17 @@ CREATE TABLE IF NOT EXISTS $GARDEN_TABLE
 
         client.execute(
             """--
+CREATE TABLE IF NOT EXISTS $GARDEN_SENSOR_TABLE
+(
+    id        UUID PRIMARY KEY,
+    name      TEXT,
+    garden_id UUID -- foreign key?
+)
+"""
+        ).await()
+
+        client.execute(
+            """--
 CREATE TABLE IF NOT EXISTS $USER_GARDEN_VIEW_TABLE
 (
     user_id    UUID, -- foreign key?
@@ -71,6 +87,17 @@ CREATE TABLE IF NOT EXISTS $GARDEN_SENSOR_ACCUMULATION
 )
 """
         ).await()
+
+        client.execute(
+            """--
+CREATE TABLE IF NOT EXISTS $SENSOR_ACCUMULATION
+(
+    sensor_id     UUID PRIMARY KEY, -- foreign key?
+    reading_sum   BIGINT,
+    reading_count BIGINT
+)
+"""
+        ).await()
     }
 
     suspend fun upsertGarden(entity: GardenPgEntity): GardenPgEntity {
@@ -87,6 +114,22 @@ ON CONFLICT (id) DO UPDATE SET name = $2
     suspend fun deleteGarden(gardenId: UUID) {
         client.execute("""DELETE FROM $GARDEN_TABLE WHERE id = $1""")
             .bind(0, gardenId).await()
+    }
+
+    suspend fun upsertGardenSensor(entity: GardenSensorPgEntity): GardenSensorPgEntity {
+        client.execute(
+            """--
+INSERT INTO $GARDEN_SENSOR_TABLE (id, name, garden_id)
+VALUES ($1, $2, $3)
+ON CONFLICT (id) DO UPDATE SET name = $2, garden_id = $3
+"""
+        ).bind(0, entity.id).bind(1, entity.name).bind(2, entity.gardenId).await()
+        return entity
+    }
+
+    suspend fun deleteGardenSensor(sensorId: UUID) {
+        client.execute("""DELETE FROM $GARDEN_SENSOR_TABLE WHERE id = $1""")
+            .bind(0, sensorId).await()
     }
 
     suspend fun upsertUser(entity: UserPgEntity): UserPgEntity {
@@ -128,6 +171,19 @@ RETURNING *
 """
         ).bind(0, gardenId).bind(1, value)
             .asType<GardenSensorAccumulationPgEntity>().fetch().awaitOne()
+    }
+
+    suspend fun accumulateSensorReading(sensorId: UUID, value: Long): SensorAccumulationPgEntity {
+        return client.execute(
+            """--
+INSERT INTO $SENSOR_ACCUMULATION (sensor_id, reading_sum, reading_count)
+VALUES ($1, $2, 1)
+ON CONFLICT (sensor_id) DO UPDATE SET reading_sum   = $SENSOR_ACCUMULATION.reading_sum + $2,
+                                      reading_count = $SENSOR_ACCUMULATION.reading_count + 1
+RETURNING *
+"""
+        ).bind(0, sensorId).bind(1, value)
+            .asType<SensorAccumulationPgEntity>().fetch().awaitOne()
     }
 
     fun getGardenViewCounts(limit: Int = 5): Flow<GardenViewCountSelectRow> {
@@ -177,5 +233,20 @@ FROM $GARDEN_SENSOR_ACCUMULATION AS acc
 ORDER BY acc.reading_sum DESC
 """
         ).asType<GardenSensorTotalSelectRow>().fetch().flow()
+    }
+
+    fun getSensorTotal(): Flow<SensorTotalSelectRow> {
+        return client.execute(
+            """--
+SELECT s.id              AS sensor_id,
+       s.name            AS sensor_name,
+       s.garden_id       AS garden_id,
+       acc.reading_sum   AS reading_sum,
+       acc.reading_count AS reading_count
+FROM $SENSOR_ACCUMULATION AS acc
+         INNER JOIN $GARDEN_SENSOR_TABLE AS s ON acc.sensor_id = s.id
+ORDER BY acc.reading_sum DESC
+"""
+        ).asType<SensorTotalSelectRow>().fetch().flow()
     }
 }

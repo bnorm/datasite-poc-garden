@@ -31,7 +31,8 @@ class ReportController(
         service.getGardenSensorTotalReport()
 
     @GetMapping("/sensors")
-    suspend fun getSensorTotalReport(): SensorReport = TODO()
+    suspend fun getSensorTotalReport(): SensorReport =
+        service.getSensorTotalReport()
 
     @Configuration
     class WebSocketConfiguration(

@@ -3,13 +3,16 @@ package com.datasite.poc.garden.report
 import com.datasite.poc.garden.dto.AuditEvent
 import com.datasite.poc.garden.dto.toUuid
 import com.datasite.poc.garden.report.dto.GardenEntity
+import com.datasite.poc.garden.report.dto.GardenSensorEntity
 import com.datasite.poc.garden.report.dto.GardenSensorReading
 import com.datasite.poc.garden.report.dto.GardenSensorReport
 import com.datasite.poc.garden.report.dto.MostPopularGardensReport
 import com.datasite.poc.garden.report.dto.Report
+import com.datasite.poc.garden.report.dto.SensorReport
 import com.datasite.poc.garden.report.dto.UserEntity
 import com.datasite.poc.garden.report.dto.UsersFavoriteGardenReport
 import com.datasite.poc.garden.report.entity.GardenPgEntity
+import com.datasite.poc.garden.report.entity.GardenSensorPgEntity
 import com.datasite.poc.garden.report.entity.UserPgEntity
 import com.datasite.poc.garden.report.entity.toReport
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -44,6 +47,9 @@ class ReportService(
     suspend fun getGardenSensorTotalReport(): GardenSensorReport =
         repository.getGardenSensorTotal().toList().toReport()
 
+    suspend fun getSensorTotalReport(): SensorReport =
+        repository.getSensorTotal().toList().toReport()
+
     @KafkaListener(topics = ["mongo.garden.table"])
     fun mongoGardenTable(
         @Payload message: String?,
@@ -58,6 +64,22 @@ class ReportService(
         }
         _reportFlow.emit(getUsersFavoriteGardenReport())
         _reportFlow.emit(getMostPopularGardensReport())
+        _reportFlow.emit(getGardenSensorTotalReport())
+    }
+
+    @KafkaListener(topics = ["mongo.garden_sensor.table"])
+    fun mongoGardenSensorTable(
+        @Payload message: String?,
+        @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) key: String?,
+    ) = runBlocking {
+        log.info("Processing Mongo garden sensors table change {}", message)
+        if (message != null) {
+            val sensor = json.decodeFromString<GardenSensorEntity>(message)
+            repository.upsertGardenSensor(GardenSensorPgEntity(sensor.id, sensor.name, sensor.gardenId))
+        } else if (key != null) {
+            repository.deleteGardenSensor(key.toUuid())
+        }
+        _reportFlow.emit(getSensorTotalReport())
     }
 
     @KafkaListener(topics = ["mongo.user.table"])
@@ -96,6 +118,8 @@ class ReportService(
         log.info("Processing Garden sensor reading {}", message)
         val reading = json.decodeFromString<GardenSensorReading>(message)
         repository.accumulateGardenSensorReading(reading.gardenId, reading.value)
+        repository.accumulateSensorReading(reading.sensorId, reading.value)
         _reportFlow.emit(getGardenSensorTotalReport())
+        _reportFlow.emit(getSensorTotalReport())
     }
 }
