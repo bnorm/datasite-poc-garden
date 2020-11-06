@@ -16,11 +16,11 @@ fun RBuilder.Reports() {
         attrs.spacing(4)
         grid {
             attrs.item = true
-            ReportCard(name = "Favorite Gardens", report = { UsersFavoriteGardenReport() })
+            ReportCard(name = "Favorite Gardens By User", report = { UsersFavoriteGardenReport() })
         }
         grid {
             attrs.item = true
-            ReportCard(name = "Popular Gardens", report = { MostPopularGardensReport() })
+            ReportCard(name = "Most Popular Gardens", report = { MostPopularGardensReport() })
         }
         grid {
             attrs.item = true
@@ -28,7 +28,7 @@ fun RBuilder.Reports() {
         }
         grid {
             attrs.item = true
-            ReportCard(name = "Total Sensor Reading", report = { SensorCountGardenReport() })
+            ReportCard(name = "Total Sensor Readings by Garden", report = { SensorCountGardenReport() })
         }
     }
 }

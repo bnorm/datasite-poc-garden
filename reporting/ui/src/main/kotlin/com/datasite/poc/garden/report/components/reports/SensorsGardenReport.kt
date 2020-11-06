@@ -2,8 +2,8 @@ package com.datasite.poc.garden.report.components.reports
 
 import com.bnorm.react.RFunction
 import com.datasite.poc.garden.report.client
-import com.datasite.poc.garden.report.dto.GardenSensorReport
 import com.datasite.poc.garden.report.dto.Report
+import com.datasite.poc.garden.report.dto.SensorReport
 import com.datasite.poc.garden.report.json
 import com.datasite.poc.garden.report.useAsync
 import io.ktor.client.features.websocket.ws
@@ -27,15 +27,15 @@ import react.useState
 @Suppress("FunctionName")
 @RFunction
 fun RBuilder.GardenSensorReport() {
-    var report by useState<GardenSensorReport?>(null)
+    var report by useState<SensorReport?>(null)
     useAsync(emptyList()) {
-        client.ws(path = "/api/v1/reports?reports=GardenSensors") {
+        client.ws(path = "/api/v1/reports?reports=Sensors") {
             val initial =
-                    client.get<GardenSensorReport>(path = "/api/v1/reports/sensors")
+                    client.get<SensorReport>(path = "/api/v1/reports/sensors")
             incoming.consumeAsFlow()
                     .filterIsInstance<Frame.Text>()
                     .map { json.decodeFromString<Report>(it.readText()) }
-                    .filterIsInstance<GardenSensorReport>()
+                    .filterIsInstance<SensorReport>()
                     .onStart { emit(initial) }
                     .onCompletion { it?.printStackTrace() }
                     .collect { report = it }

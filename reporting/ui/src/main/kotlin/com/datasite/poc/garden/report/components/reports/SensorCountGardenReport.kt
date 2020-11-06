@@ -31,7 +31,7 @@ fun RBuilder.SensorCountGardenReport() {
     useAsync(emptyList()) {
         client.ws(path = "/api/v1/reports?reports=GardenSensors") {
             val initial =
-                    client.get<GardenSensorReport>(path = "/api/v1/reports/sensors")
+                    client.get<GardenSensorReport>(path = "/api/v1/reports/garden_sensors")
             incoming.consumeAsFlow()
                     .filterIsInstance<Frame.Text>()
                     .map { json.decodeFromString<Report>(it.readText()) }
