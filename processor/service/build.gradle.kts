@@ -18,8 +18,6 @@ extra["testcontainersVersion"] = "1.14.3"
 
 dependencies {
 	implementation(project(":processor:processor-common"))
-	implementation(project(":gardening:gardening-common"))
-	implementation(project(":auditing:auditing-common"))
 
 	implementation("org.springframework.cloud:spring-cloud-stream")
 	implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams")

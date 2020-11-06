@@ -1,7 +1,7 @@
 package com.datasite.poc.garden.report.entity
 
-import com.datasite.poc.garden.report.dto.Garden
-import com.datasite.poc.garden.report.dto.User
+import com.datasite.poc.garden.dto.toUuid
+import com.datasite.poc.garden.report.dto.UserEntity
 import com.datasite.poc.garden.report.dto.UsersFavoriteGardenReport
 
 data class UserGardenViewCountEntity(
@@ -16,7 +16,7 @@ fun List<UserGardenViewCountEntity>.toReport() =
 
 fun UserGardenViewCountEntity.toMetric() =
     UsersFavoriteGardenReport.Metric(
-        User(userId, userId),
-        Garden(gardenId, gardenName),
+        UserEntity(userId.toUuid(), userId, emptyList()),
+        com.datasite.poc.garden.report.dto.GardenEntity(gardenId.toUuid(), gardenName),
         viewCount
     )
