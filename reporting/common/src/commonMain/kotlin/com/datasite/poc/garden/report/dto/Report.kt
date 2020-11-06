@@ -47,3 +47,18 @@ data class GardenSensorReport(
         val readingCount: Long,
     )
 }
+
+
+@Serializable
+data class SensorReport(
+    val metrics: List<Metric>
+) : Report() {
+    override val name: String = "Sensors"
+
+    @Serializable
+    data class Metric(
+        val garden: GardenSensorEntity,
+        val readingSum: Long,
+        val readingCount: Long,
+    )
+}
