@@ -8,6 +8,8 @@ import com.datasite.poc.garden.dto.GardenSensorPatch
 import com.datasite.poc.garden.dto.GardenSensorPrototype
 import com.datasite.poc.garden.dto.Uuid
 import com.datasite.poc.garden.iot.dto.SensorReading
+import java.net.URI
+import javax.annotation.PostConstruct
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,8 +25,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.awaitExchange
 import reactor.netty.http.client.HttpClient
-import java.net.URI
-import javax.annotation.PostConstruct
 import kotlin.random.Random
 
 @Service
@@ -94,7 +94,10 @@ class SimulatorService(
             SimulatorAction.SensorReadings -> {
                 val sensor = getAllGardenSensors(user).random()
                 logger.info("Sensor reading: sensor={}", sensor)
-                submitSensorReading(sensor, Random.nextLong(1, 11))
+                submitSensorReading(sensor, Random.nextLong(
+                        Random.nextLong(1, 50),
+                        Random.nextLong(50, 101)
+                ))
             }
             SimulatorAction.UserAccess -> {
                 val garden = getAllGardens(user).random()
