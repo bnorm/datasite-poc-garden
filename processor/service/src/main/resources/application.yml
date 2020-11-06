@@ -4,16 +4,6 @@ spring:
   kafka:
     bootstrapServers: localhost:9092
 
-spring.cloud.stream.bindings:
-  mongoGardenOpLog:
-    destination: mongo.datasite-poc.gardens
-  mongoGardenTable:
-    destination: mongo.garden.table
-  gardenAuditLog:
-    destination: audit.garden.event
-  gardenEnhancedAuditLog:
-    destination: audit.garden.event.enhanced
-
 logging:
   level:
     org.apache.kafka: WARN

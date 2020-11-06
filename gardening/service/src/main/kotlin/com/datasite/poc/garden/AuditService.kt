@@ -1,6 +1,6 @@
 package com.datasite.poc.garden
 
-import com.datasite.poc.garden.audit.dto.AuditEvent
+import com.datasite.poc.garden.dto.AuditEvent
 import com.datasite.poc.garden.dto.Uuid
 import com.datasite.poc.garden.user.currentUser
 import kotlinx.serialization.encodeToString
@@ -73,7 +73,7 @@ class AuditService(
     }
 
     private fun audit(key: Uuid, audit: AuditEvent) {
-        kafkaTemplate.send("audit.garden.events", key.toString(), json.encodeToString(audit))
+        kafkaTemplate.send("audit.garden.event", key.toString(), json.encodeToString(audit))
     }
 
     private suspend fun currentTransactionId(): String {

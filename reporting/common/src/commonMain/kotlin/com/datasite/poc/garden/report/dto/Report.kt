@@ -15,7 +15,7 @@ data class MostPopularGardensReport(
 
     @Serializable
     data class Metric(
-        val garden: Garden,
+        val garden: GardenEntity,
         val viewCount: Long,
     )
 }
@@ -28,9 +28,22 @@ data class UsersFavoriteGardenReport(
 
     @Serializable
     data class Metric(
-            val user: User,
-            val garden: Garden,
-            val viewCount: Long
+        val user: UserEntity,
+        val garden: GardenEntity,
+        val viewCount: Long
     )
 }
 
+@Serializable
+data class GardenSensorReport(
+    val metrics: List<Metric>
+) : Report() {
+    override val name: String = "GardenSensors"
+
+    @Serializable
+    data class Metric(
+        val garden: GardenEntity,
+        val readingSum: Long,
+        val readingCount: Long,
+    )
+}

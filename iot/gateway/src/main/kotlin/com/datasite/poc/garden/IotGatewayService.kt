@@ -23,7 +23,7 @@ class IotGatewayService(
         val sensorReadingAsJson: String = Json.encodeToString(sensorReading)
         logger.info("sending sensor reading to kafka topic {} : {}", IOT_GARDEN_READING_TOPIC, sensorReadingAsJson)
 
-        kafkaTemplate.send(IOT_GARDEN_READING_TOPIC, sensorReading.sensorId, sensorReadingAsJson).addCallback(
+        kafkaTemplate.send(IOT_GARDEN_READING_TOPIC, sensorReading.sensorId.toString(), sensorReadingAsJson).addCallback(
                 { sendResult ->
                     logger.info("successfully sent : partition {},  offset : {}",
                             sendResult?.recordMetadata?.partition(),

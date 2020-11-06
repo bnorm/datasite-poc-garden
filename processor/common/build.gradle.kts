@@ -15,6 +15,8 @@ kotlin {
         named("commonMain") {
             dependencies {
                 api(project(":gardening:gardening-common"))
+                api(project(":iot:iot-common"))
+                api(project(":reporting:reporting-common"))
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
             }
         }

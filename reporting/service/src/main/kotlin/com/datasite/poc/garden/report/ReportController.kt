@@ -1,5 +1,6 @@
 package com.datasite.poc.garden.report
 
+import com.datasite.poc.garden.report.dto.GardenSensorReport
 import com.datasite.poc.garden.report.dto.MostPopularGardensReport
 import com.datasite.poc.garden.report.dto.UsersFavoriteGardenReport
 import org.springframework.context.annotation.Bean
@@ -23,6 +24,10 @@ class ReportController(
     @GetMapping("/favorite")
     suspend fun getUsersFavoriteGardenReport(): UsersFavoriteGardenReport =
         service.getUsersFavoriteGardenReport()
+
+    @GetMapping("/sensors")
+    suspend fun getGardenSensorTotalReport(): GardenSensorReport =
+        service.getGardenSensorTotalReport()
 
     @Configuration
     class WebSocketConfiguration(

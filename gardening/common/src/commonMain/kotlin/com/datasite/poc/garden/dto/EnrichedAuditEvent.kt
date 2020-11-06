@@ -1,8 +1,5 @@
-package com.datasite.poc.garden.audit.dto
+package com.datasite.poc.garden.dto
 
-import com.datasite.poc.garden.dto.Garden
-import com.datasite.poc.garden.dto.Uuid
-import com.datasite.poc.garden.dto.UuidSerializer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 

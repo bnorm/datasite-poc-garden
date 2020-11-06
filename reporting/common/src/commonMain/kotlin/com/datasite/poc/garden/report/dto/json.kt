@@ -6,8 +6,8 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 
 val reportDtoSerializersModule = SerializersModule {
-    contextual(User.serializer())
-    contextual(Garden.serializer())
+    contextual(UserEntity.serializer())
+    contextual(GardenEntity.serializer())
     contextual(Report.serializer())
     polymorphic(Report::class) {
         subclass(MostPopularGardensReport::class)

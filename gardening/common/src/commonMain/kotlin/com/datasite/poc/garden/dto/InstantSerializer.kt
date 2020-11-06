@@ -1,4 +1,4 @@
-package com.datasite.poc.garden.audit.dto
+package com.datasite.poc.garden.dto
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toInstant

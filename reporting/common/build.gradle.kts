@@ -14,6 +14,7 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
+                api(project(":gardening:gardening-common"))
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
             }
         }

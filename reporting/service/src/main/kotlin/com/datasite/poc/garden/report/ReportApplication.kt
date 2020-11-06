@@ -6,11 +6,11 @@ import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 
 @SpringBootApplication
-class DatasiteGardenReportApplication {
+class ReportApplication {
     @get:Bean
     val json: Json = Json.Default
 }
 
 fun main(args: Array<String>) {
-    runApplication<DatasiteGardenReportApplication>(*args)
+    runApplication<ReportApplication>(*args)
 }

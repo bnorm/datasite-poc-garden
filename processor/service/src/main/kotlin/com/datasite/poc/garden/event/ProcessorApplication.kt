@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class DatasiteGardenEventApplication
+class ProcessorApplication
 
 fun main(args: Array<String>) {
-    runApplication<DatasiteGardenEventApplication>(*args)
+    runApplication<ProcessorApplication>(*args)
 }
