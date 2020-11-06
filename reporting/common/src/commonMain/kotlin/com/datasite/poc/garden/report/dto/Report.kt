@@ -34,3 +34,16 @@ data class UsersFavoriteGardenReport(
     )
 }
 
+@Serializable
+data class GardenSensorReport(
+    val metrics: List<Metric>
+) : Report() {
+    override val name: String = "GardenSensors"
+
+    @Serializable
+    data class Metric(
+        val garden: GardenEntity,
+        val readingSum: Long,
+        val readingCount: Long,
+    )
+}

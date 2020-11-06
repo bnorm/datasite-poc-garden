@@ -24,6 +24,8 @@ class KafkaConfig(
                 ConsumerConfig.GROUP_ID_CONFIG to "datasite-poc-garden-report",
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
+                // If not consuming yet, start from the very beginning
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
             )
         )
     }
