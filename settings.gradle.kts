@@ -1,3 +1,10 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
+}
+
 rootProject.name = "datasite-poc-garden"
 
 import(":gardening:common")
@@ -9,7 +16,8 @@ import(":processor:common")
 import(":processor:service")
 import(":reporting:common")
 import(":reporting:service")
-import(":reporting:ui")
+include(":reporting:ui:web")
+include(":reporting:ui:desktop")
 
 fun import(name: String) {
     val projectName = name.replace(":", "-").removePrefix("-")

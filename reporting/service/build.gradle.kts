@@ -64,7 +64,7 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.processResources.configure {
-	from(tasks.getByPath(":reporting:reporting-ui:jsBundle")) {
+	from(tasks.getByPath(":reporting:ui:web:jsBundle")) {
 		into("static")
 	}
 }

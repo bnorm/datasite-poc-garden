@@ -58,9 +58,3 @@ tasks.withType<KotlinCompile> {
 		jvmTarget = "11"
 	}
 }
-
-tasks.processResources.configure {
-	from(tasks.getByPath(":reporting:reporting-ui:jsBundle")) {
-		into("static")
-	}
-}
