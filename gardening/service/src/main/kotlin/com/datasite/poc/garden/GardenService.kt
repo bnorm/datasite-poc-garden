@@ -6,11 +6,8 @@ import com.datasite.poc.garden.dto.GardenPrototype
 import com.datasite.poc.garden.entity.toGarden
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactor.mono
-import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import reactor.core.publisher.Mono
 import java.util.*
 
 @Service
@@ -32,32 +29,30 @@ class GardenService(
         return entity.toGarden()
     }
 
-    @Transactional // suspend should work in spring boot 2.4
-    fun createGarden(
+    @Transactional
+    suspend fun createGarden(
         prototype: GardenPrototype
-    ): Mono<Garden> = mono {
+    ): Garden {
         val entity = repository.createGarden(prototype)
         auditService.auditGardenCreate()
-        return@mono entity.toGarden()
+        return entity.toGarden()
     }
 
-    @Transactional // suspend should work in spring boot 2.4
-    fun updateGarden(
+    @Transactional
+    suspend fun updateGarden(
         id: UUID,
         patch: GardenPatch
-    ): Mono<Garden?> = mono {
-        val entity = repository.updateGarden(id, patch) ?: return@mono null
+    ): Garden? {
+        val entity = repository.updateGarden(id, patch) ?: return null
         auditService.auditGardenUpdate()
-        return@mono entity.toGarden()
+        return entity.toGarden()
     }
 
-    @Transactional // suspend should work in spring boot 2.4
-    fun deleteGarden(
+    @Transactional
+    suspend fun deleteGarden(
         id: UUID
-    ): Mono<Unit> = mono {
+    ) {
         repository.deleteGarden(id)
         auditService.auditGardenDelete()
     }
 }
-
-fun String.toObjectId() = if (ObjectId.isValid(this)) ObjectId(this) else null

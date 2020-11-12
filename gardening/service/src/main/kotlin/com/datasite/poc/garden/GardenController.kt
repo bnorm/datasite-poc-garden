@@ -34,17 +34,17 @@ class GardenController(
     @PostMapping
     suspend fun createGarden(
         @RequestBody prototype: GardenPrototype
-    ): Garden = service.createGarden(prototype).awaitSingle()
+    ): Garden = service.createGarden(prototype)
 
     @PutMapping("/{id}")
     suspend fun createGarden(
         @PathVariable id: UUID,
         @RequestBody patch: GardenPatch
-    ): Garden = service.updateGarden(id, patch).awaitSingleOrNull()
+    ): Garden = service.updateGarden(id, patch)
         ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown Garden with id=$id")
 
     @DeleteMapping("/{id}")
     suspend fun deleteGarden(
         @PathVariable id: UUID
-    ): Unit = service.deleteGarden(id).awaitSingle()
+    ): Unit = service.deleteGarden(id)
 }

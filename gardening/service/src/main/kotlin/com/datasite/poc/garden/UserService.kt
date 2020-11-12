@@ -8,10 +8,8 @@ import com.datasite.poc.garden.entity.toGarden
 import com.datasite.poc.garden.entity.toUser
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactor.mono
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import reactor.core.publisher.Mono
 import java.util.*
 
 @Service
@@ -30,27 +28,27 @@ class UserService(
         return entity.toUser()
     }
 
-    @Transactional // suspend should work in spring boot 2.4
-    fun createUser(
+    @Transactional
+    suspend fun createUser(
         prototype: UserPrototype
-    ): Mono<User> = mono {
+    ): User {
         val entity = userRepository.createUser(prototype)
-        return@mono entity.toUser()
+        return entity.toUser()
     }
 
-    @Transactional // suspend should work in spring boot 2.4
-    fun updateUser(
+    @Transactional
+    suspend fun updateUser(
         id: UUID,
         patch: UserPatch
-    ): Mono<User?> = mono {
-        val entity = userRepository.updateUser(id, patch) ?: return@mono null
-        return@mono entity.toUser()
+    ): User? {
+        val entity = userRepository.updateUser(id, patch) ?: return null
+        return entity.toUser()
     }
 
-    @Transactional // suspend should work in spring boot 2.4
-    fun deleteUser(
+    @Transactional
+    suspend fun deleteUser(
         id: UUID
-    ): Mono<Unit> = mono {
+    ) {
         userRepository.deleteUser(id)
     }
 

@@ -8,10 +8,8 @@ import com.datasite.poc.garden.entity.toGarden
 import com.datasite.poc.garden.entity.toGardenSensor
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactor.mono
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import reactor.core.publisher.Mono
 import java.util.*
 
 @Service
@@ -34,29 +32,29 @@ class GardenSensorService(
         return entity.toGardenSensor()
     }
 
-    @Transactional // suspend should work in spring boot 2.4
-    fun createGardenSensor(
+    @Transactional
+    suspend fun createGardenSensor(
         prototype: GardenSensorPrototype
-    ): Mono<GardenSensor> = mono {
+    ): GardenSensor {
         val entity = sensorRepository.createGardenSensor(prototype)
         auditService.auditGardenSensorCreate()
-        return@mono entity.toGardenSensor()
+        return entity.toGardenSensor()
     }
 
-    @Transactional // suspend should work in spring boot 2.4
-    fun updateGardenSensor(
+    @Transactional
+    suspend fun updateGardenSensor(
         id: UUID,
         patch: GardenSensorPatch
-    ): Mono<GardenSensor?> = mono {
-        val entity = sensorRepository.updateGardenSensor(id, patch) ?: return@mono null
+    ): GardenSensor? {
+        val entity = sensorRepository.updateGardenSensor(id, patch) ?: return null
         auditService.auditGardenSensorUpdate()
-        return@mono entity.toGardenSensor()
+        return entity.toGardenSensor()
     }
 
-    @Transactional // suspend should work in spring boot 2.4
-    fun deleteGardenSensor(
+    @Transactional
+    suspend fun deleteGardenSensor(
         id: UUID
-    ): Mono<Unit> = mono {
+    ) {
         sensorRepository.deleteGardenSensor(id)
         auditService.auditGardenSensorDelete()
     }

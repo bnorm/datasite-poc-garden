@@ -3,8 +3,6 @@ package com.datasite.poc.garden
 import com.datasite.poc.garden.dto.GardenSensor
 import com.datasite.poc.garden.dto.GardenSensorPatch
 import com.datasite.poc.garden.dto.GardenSensorPrototype
-import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.reactive.awaitSingleOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -34,17 +32,17 @@ class GardenSensorController(
     @PostMapping
     suspend fun createGardenSensor(
         @RequestBody prototype: GardenSensorPrototype
-    ): GardenSensor = service.createGardenSensor(prototype).awaitSingle()
+    ): GardenSensor = service.createGardenSensor(prototype)
 
     @PutMapping("/{id}")
     suspend fun createGardenSensor(
         @PathVariable id: UUID,
         @RequestBody patch: GardenSensorPatch
-    ): GardenSensor = service.updateGardenSensor(id, patch).awaitSingleOrNull()
+    ): GardenSensor = service.updateGardenSensor(id, patch)
         ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown GardenSensor with id=$id")
 
     @DeleteMapping("/{id}")
     suspend fun deleteGardenSensor(
         @PathVariable id: UUID
-    ): Unit = service.deleteGardenSensor(id).awaitSingle()
+    ): Unit = service.deleteGardenSensor(id)
 }

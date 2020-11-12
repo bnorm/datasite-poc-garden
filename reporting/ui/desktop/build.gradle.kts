@@ -1,4 +1,5 @@
 import org.jetbrains.compose.compose
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("jvm")
@@ -24,5 +25,8 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "com.datasite.poc.garden.report.MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+        }
     }
 }
