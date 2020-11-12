@@ -16,13 +16,17 @@ import com.datasite.poc.garden.report.entity.USER_TABLE
 import com.datasite.poc.garden.report.entity.UserGardenViewCountSelectRow
 import com.datasite.poc.garden.report.entity.UserGardenViewPgEntity
 import com.datasite.poc.garden.report.entity.UserPgEntity
+import com.datasite.poc.garden.report.entity.*
+import com.datasite.poc.garden.report.entity.toGardenViewCountSelectRow
+import com.datasite.poc.garden.report.entity.toSensorTotalSelectRow
+import com.datasite.poc.garden.report.entity.toUserGardenViewCountSelectRow
+import io.r2dbc.spi.Row
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
-import org.springframework.data.r2dbc.core.DatabaseClient
-import org.springframework.data.r2dbc.core.asType
-import org.springframework.data.r2dbc.core.await
-import org.springframework.data.r2dbc.core.awaitOne
-import org.springframework.data.r2dbc.core.flow
+import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.r2dbc.core.await
+import org.springframework.r2dbc.core.awaitOne
+import org.springframework.r2dbc.core.flow
 import org.springframework.stereotype.Repository
 import java.util.*
 import javax.annotation.PostConstruct
@@ -33,7 +37,7 @@ class ReportRepository(
 ) {
     @PostConstruct
     fun init() = runBlocking {
-        client.execute(
+        client.sql(
             """--
 CREATE TABLE IF NOT EXISTS $USER_TABLE
 (
@@ -43,7 +47,7 @@ CREATE TABLE IF NOT EXISTS $USER_TABLE
 """
         ).await()
 
-        client.execute(
+        client.sql(
             """--
 CREATE TABLE IF NOT EXISTS $GARDEN_TABLE
 (
@@ -53,7 +57,7 @@ CREATE TABLE IF NOT EXISTS $GARDEN_TABLE
 """
         ).await()
 
-        client.execute(
+        client.sql(
             """--
 CREATE TABLE IF NOT EXISTS $GARDEN_SENSOR_TABLE
 (
@@ -64,7 +68,7 @@ CREATE TABLE IF NOT EXISTS $GARDEN_SENSOR_TABLE
 """
         ).await()
 
-        client.execute(
+        client.sql(
             """--
 CREATE TABLE IF NOT EXISTS $USER_GARDEN_VIEW_TABLE
 (
@@ -77,7 +81,7 @@ CREATE TABLE IF NOT EXISTS $USER_GARDEN_VIEW_TABLE
 """
         ).await()
 
-        client.execute(
+        client.sql(
             """--
 CREATE TABLE IF NOT EXISTS $GARDEN_SENSOR_ACCUMULATION
 (
@@ -88,7 +92,7 @@ CREATE TABLE IF NOT EXISTS $GARDEN_SENSOR_ACCUMULATION
 """
         ).await()
 
-        client.execute(
+        client.sql(
             """--
 CREATE TABLE IF NOT EXISTS $SENSOR_ACCUMULATION
 (
@@ -101,7 +105,7 @@ CREATE TABLE IF NOT EXISTS $SENSOR_ACCUMULATION
     }
 
     suspend fun upsertGarden(entity: GardenPgEntity): GardenPgEntity {
-        client.execute(
+        client.sql(
             """--
 INSERT INTO $GARDEN_TABLE (id, name)
 VALUES ($1, $2)
@@ -112,12 +116,12 @@ ON CONFLICT (id) DO UPDATE SET name = $2
     }
 
     suspend fun deleteGarden(gardenId: UUID) {
-        client.execute("""DELETE FROM $GARDEN_TABLE WHERE id = $1""")
+        client.sql("""DELETE FROM $GARDEN_TABLE WHERE id = $1""")
             .bind(0, gardenId).await()
     }
 
     suspend fun upsertGardenSensor(entity: GardenSensorPgEntity): GardenSensorPgEntity {
-        client.execute(
+        client.sql(
             """--
 INSERT INTO $GARDEN_SENSOR_TABLE (id, name, garden_id)
 VALUES ($1, $2, $3)
@@ -128,12 +132,12 @@ ON CONFLICT (id) DO UPDATE SET name = $2, garden_id = $3
     }
 
     suspend fun deleteGardenSensor(sensorId: UUID) {
-        client.execute("""DELETE FROM $GARDEN_SENSOR_TABLE WHERE id = $1""")
+        client.sql("""DELETE FROM $GARDEN_SENSOR_TABLE WHERE id = $1""")
             .bind(0, sensorId).await()
     }
 
     suspend fun upsertUser(entity: UserPgEntity): UserPgEntity {
-        client.execute(
+        client.sql(
             """--
 INSERT INTO $USER_TABLE (id, name)
 VALUES ($1, $2)
@@ -144,12 +148,12 @@ ON CONFLICT (id) DO UPDATE SET name = $2
     }
 
     suspend fun deleteUser(userId: UUID) {
-        client.execute("""DELETE FROM $USER_TABLE WHERE id = $1""")
+        client.sql("""DELETE FROM $USER_TABLE WHERE id = $1""")
             .bind(0, userId).await()
     }
 
     suspend fun incrementUserGardenViewCount(userId: UUID, gardenId: UUID): UserGardenViewPgEntity {
-        return client.execute(
+        return client.sql(
             """--
 INSERT INTO $USER_GARDEN_VIEW_TABLE (user_id, garden_id, view_count)
 VALUES ($1, $2, 1)
@@ -157,11 +161,11 @@ ON CONFLICT (user_id, garden_id) DO UPDATE SET view_count = $USER_GARDEN_VIEW_TA
 RETURNING *
 """
         ).bind(0, userId).bind(1, gardenId)
-            .asType<UserGardenViewPgEntity>().fetch().awaitOne()
+            .map(Row::toUserGardenViewPgEntity).awaitOne()
     }
 
     suspend fun accumulateGardenSensorReading(gardenId: UUID, value: Long): GardenSensorAccumulationPgEntity {
-        return client.execute(
+        return client.sql(
             """--
 INSERT INTO $GARDEN_SENSOR_ACCUMULATION (garden_id, reading_sum, reading_count)
 VALUES ($1, $2, 1)
@@ -170,11 +174,11 @@ ON CONFLICT (garden_id) DO UPDATE SET reading_sum   = $GARDEN_SENSOR_ACCUMULATIO
 RETURNING *
 """
         ).bind(0, gardenId).bind(1, value)
-            .asType<GardenSensorAccumulationPgEntity>().fetch().awaitOne()
+            .map(Row::toGardenSensorAccumulationPgEntity).awaitOne()
     }
 
     suspend fun accumulateSensorReading(sensorId: UUID, value: Long): SensorAccumulationPgEntity {
-        return client.execute(
+        return client.sql(
             """--
 INSERT INTO $SENSOR_ACCUMULATION (sensor_id, reading_sum, reading_count)
 VALUES ($1, $2, 1)
@@ -183,11 +187,11 @@ ON CONFLICT (sensor_id) DO UPDATE SET reading_sum   = $SENSOR_ACCUMULATION.readi
 RETURNING *
 """
         ).bind(0, sensorId).bind(1, value)
-            .asType<SensorAccumulationPgEntity>().fetch().awaitOne()
+            .map(Row::toSensorAccumulationPgEntity).awaitOne()
     }
 
     fun getGardenViewCounts(limit: Int = 5): Flow<GardenViewCountSelectRow> {
-        return client.execute(
+        return client.sql(
             """--
 SELECT garden.id             AS id,
        garden.name           AS name,
@@ -198,11 +202,11 @@ GROUP BY garden.id, garden.name
 ORDER BY 3 DESC
 LIMIT $1
 """
-        ).bind(0, limit).asType<GardenViewCountSelectRow>().fetch().flow()
+        ).bind(0, limit).map(Row::toGardenViewCountSelectRow).flow()
     }
 
     fun getUserTopGarden(): Flow<UserGardenViewCountSelectRow> {
-        return client.execute(
+        return client.sql(
             """--
 SELECT u.id              AS user_id,
        u.name            AS user_name,
@@ -218,11 +222,11 @@ FROM (
 WHERE ranked.rank = 1
 ORDER BY ranked.view_count DESC
 """
-        ).asType<UserGardenViewCountSelectRow>().fetch().flow()
+        ).map(Row::toUserGardenViewCountSelectRow).flow()
     }
 
     fun getGardenSensorTotal(): Flow<GardenSensorTotalSelectRow> {
-        return client.execute(
+        return client.sql(
             """--
 SELECT g.id              AS garden_id,
        g.name            AS garden_name,
@@ -232,11 +236,11 @@ FROM $GARDEN_SENSOR_ACCUMULATION AS acc
          INNER JOIN $GARDEN_TABLE AS g ON acc.garden_id = g.id
 ORDER BY acc.reading_sum DESC
 """
-        ).asType<GardenSensorTotalSelectRow>().fetch().flow()
+        ).map(Row::toGardenSensorTotalSelectRow).flow()
     }
 
     fun getSensorTotal(): Flow<SensorTotalSelectRow> {
-        return client.execute(
+        return client.sql(
             """--
 SELECT s.id              AS sensor_id,
        s.name            AS sensor_name,
@@ -247,6 +251,6 @@ FROM $SENSOR_ACCUMULATION AS acc
          INNER JOIN $GARDEN_SENSOR_TABLE AS s ON acc.sensor_id = s.id
 ORDER BY acc.reading_sum DESC
 """
-        ).asType<SensorTotalSelectRow>().fetch().flow()
+        ).map(Row::toSensorTotalSelectRow).flow()
     }
 }

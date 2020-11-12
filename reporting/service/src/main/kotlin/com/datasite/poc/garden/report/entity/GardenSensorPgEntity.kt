@@ -1,5 +1,6 @@
 package com.datasite.poc.garden.report.entity
 
+import io.r2dbc.spi.Row
 import org.springframework.data.relational.core.mapping.Table
 import java.util.*
 
@@ -10,4 +11,10 @@ class GardenSensorPgEntity(
     val id: UUID,
     val name: String,
     val gardenId: UUID,
+)
+
+fun Row.toGardenSensorPgEntity() = GardenSensorPgEntity(
+    get(GardenSensorPgEntity::id),
+    get(GardenSensorPgEntity::name),
+    get(GardenSensorPgEntity::gardenId),
 )

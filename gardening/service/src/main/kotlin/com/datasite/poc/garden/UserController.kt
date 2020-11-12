@@ -34,17 +34,17 @@ class UserController(
     @PostMapping
     suspend fun createUser(
         @RequestBody prototype: UserPrototype
-    ): User = service.createUser(prototype).awaitSingle()
+    ): User = service.createUser(prototype)
 
     @PutMapping("/{id}")
     suspend fun createUser(
         @PathVariable id: UUID,
         @RequestBody patch: UserPatch
-    ): User = service.updateUser(id, patch).awaitSingleOrNull()
+    ): User = service.updateUser(id, patch)
         ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown User with id=$id")
 
     @DeleteMapping("/{id}")
     suspend fun deleteUser(
         @PathVariable id: UUID
-    ): Unit = service.deleteUser(id).awaitSingle()
+    ): Unit = service.deleteUser(id)
 }

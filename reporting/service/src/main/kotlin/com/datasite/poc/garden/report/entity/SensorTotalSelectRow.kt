@@ -2,6 +2,7 @@ package com.datasite.poc.garden.report.entity
 
 import com.datasite.poc.garden.report.dto.GardenSensorEntity
 import com.datasite.poc.garden.report.dto.SensorReport
+import io.r2dbc.spi.Row
 import java.util.*
 
 data class SensorTotalSelectRow(
@@ -10,6 +11,14 @@ data class SensorTotalSelectRow(
     val gardenId: UUID,
     val readingSum: Long,
     val readingCount: Long,
+)
+
+fun Row.toSensorTotalSelectRow() = SensorTotalSelectRow(
+    get(SensorTotalSelectRow::sensorId),
+    get(SensorTotalSelectRow::sensorName),
+    get(SensorTotalSelectRow::gardenId),
+    get(SensorTotalSelectRow::readingSum),
+    get(SensorTotalSelectRow::readingCount),
 )
 
 fun List<SensorTotalSelectRow>.toReport() =

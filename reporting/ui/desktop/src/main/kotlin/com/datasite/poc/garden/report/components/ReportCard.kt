@@ -15,9 +15,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.retry
 
@@ -32,6 +34,7 @@ fun <T> ReportCard(
     LaunchedEffect(null) {
         reports.onCompletion { it?.printStackTrace() }
             .retry { delay(5_000); true }
+            .flowOn(Dispatchers.Default)
             .collect { report = it }
     }
 

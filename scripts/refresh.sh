@@ -19,7 +19,7 @@ docker-compose exec mongo /bin/bash -c 'mongo localhost:27017/datasite-poc <<-EO
     });
 EOF'
 
-sleep 5
+sleep 15
 echo "initiating debezium connector"
 
 curl -i -X POST \
